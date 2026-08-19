@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>张小明 · 全栈工程师 · 硬核科技主页</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ 加载转场：全屏故障艺术 ============ -->
+<div class="glitch-overlay" id="glitchOverlay">
+  <div class="glitch-text" data-text="INITIALIZING">INITIALIZING</div>
+  <div class="glitch-sub">LOADING PROFILE // 01001010</div>
+</div>
+
+<!-- ============ 背景动效画布 ============ -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- ============ 导航栏 ============ -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">&gt;_ XIAOMING<span class="cursor">▊</span></div>
+  <ul class="nav-links">
+    <li><a href="#hero">首页</a></li>
+    <li><a href="#skills">技能</a></li>
+    <li><a href="#projects">项目</a></li>
+    <li><a href="#contact">联系</a></li>
+  </ul>
+</nav>
+
+<!-- ============ Hero ============ -->
+<header class="hero" id="hero">
+  <div class="hologram">
+    <div class="holo-ring"></div>
+    <!-- 头像：把你的透明 PNG 放本目录改名 avatar.png，去掉下面那行注释、删掉"张"字即可 -->
+    <div class="holo-avatar"><!-- <img src="avatar.png" alt="头像"> -->张</div>
+    <div class="holo-scan"></div>
+  </div>
+  <h1 class="hero-name" id="typeTarget"></h1>
+  <div class="hero-tags">
+    <span class="tag">全栈工程师</span>
+    <span class="tag">WEBGL / THREE.JS</span>
+    <span class="tag">CREATIVE DEVELOPER</span>
+  </div>
+  <p class="hero-desc">用代码构建赛博世界的造梦师 // Building the future, one commit at a time.</p>
+  <div class="hero-cta">
+    <a href="#projects" class="btn btn-primary">查看作品 →</a>
+    <a href="#contact" class="btn btn-ghost">联系我</a>
+  </div>
+</header>
+
+<!-- ============ Skills ============ -->
+<section class="section" id="skills">
+  <h2 class="section-title"><span class="glitch-h">技能矩阵</span><span class="section-en">// SKILLS</span></h2>
+  <div class="skills-grid">
+    <!-- 环形进度条：JS 根据 data-value 填充 -->
+    <div class="skill-ring" data-value="95"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>95%</strong><span>Vue / React</span></div></div>
+    <div class="skill-ring" data-value="90"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>90%</strong><span>TypeScript</span></div></div>
+    <div class="skill-ring" data-value="85"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>85%</strong><span>Node.js</span></div></div>
+    <div class="skill-ring" data-value="80"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>80%</strong><span>Three.js / WebGL</span></div></div>
+    <div class="skill-ring" data-value="88"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>88%</strong><span>CSS3 动效</span></div></div>
+  </div>
+</section>
+
+<!-- ============ Projects ============ -->
+<section class="section" id="projects">
+  <h2 class="section-title"><span class="glitch-h">精选项目</span><span class="section-en">// PROJECTS</span></h2>
+  <div class="projects-grid">
+    <article class="proj-card tilt">
+      <div class="proj-bg">🛰️</div>
+      <div class="proj-body">
+        <h3>数据可视化大屏</h3>
+        <p>ECharts + WebSocket 实时数据大屏，峰值 10 万 QPS。</p>
+      </div>
+      <div class="proj-overlay"><span>WEBGL / 实时渲染</span><a href="#">查看详情 →</a></div>
+    </article>
+    <article class="proj-card tilt">
+      <div class="proj-bg">🤖</div>
+      <div class="proj-body">
+        <h3>AI 智能客服中台</h3>
+        <p>大模型 RAG 客服系统，自动应答率 85%。</p>
+      </div>
+      <div class="proj-overlay"><span>LLM / RAG</span><a href="#">查看详情 →</a></div>
+    </article>
+    <article class="proj-card tilt">
+      <div class="proj-bg">🌐</div>
+      <div class="proj-body">
+        <h3>赛博城市 3D 场景</h3>
+        <p>Three.js 打造的未来都市，粒子霓虹夜景。</p>
+      </div>
+      <div class="proj-overlay"><span>THREE.JS</span><a href="#">查看详情 →</a></div>
+    </article>
+    <article class="proj-card tilt">
+      <div class="proj-bg">📱</div>
+      <div class="proj-body">
+        <h3>小程序电商商城</h3>
+        <p>日活 3 万+，从 0 到 1 的完整交付。</p>
+      </div>
+      <div class="proj-overlay"><span>MINI-PROGRAM</span><a href="#">查看详情 →</a></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ Contact ============ -->
+<section class="section" id="contact">
+  <h2 class="section-title"><span class="glitch-h">与我联系</span><span class="section-en">// CONTACT</span></h2>
+  <div class="contact-row">
+    <button class="contact-btn" data-copy="xiaoming@email.com" title="点击复制邮箱">📧</button>
+    <a class="contact-btn" href="https://github.com" target="_blank" title="GitHub">🐙</a>
+    <button class="contact-btn" data-copy="13800000000" title="点击复制电话">📞</button>
+    <a class="contact-btn" href="https://twitter.com" target="_blank" title="Twitter">🐦</a>
+  </div>
+  <p class="contact-tip" id="copyTip"></p>
+</section>
+
+<footer class="footer">© 2026 张小明 · 硬核科技风 · 原生 HTML/CSS/JS 构建</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
