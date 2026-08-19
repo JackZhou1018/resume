@@ -14,7 +14,12 @@
   <div class="glitch-sub">LOADING PROFILE // 01001010</div>
 </div>
 
-<!-- ============ 背景动效画布 ============ -->
+<!-- ============ 视频背景（把 bg.mp4 放本目录即可；没有则显示星空+黑洞）============ -->
+<video class="bg-video" id="bgVideo" autoplay muted loop playsinline>
+  <source src="bg.mp4" type="video/mp4">
+</video>
+
+<!-- ============ 背景动效画布（星空叠加层）============ -->
 <canvas id="bgCanvas"></canvas>
 
 <!-- ============ 导航栏 ============ -->
@@ -32,8 +37,7 @@
 <header class="hero" id="hero">
   <div class="hologram">
     <div class="holo-ring"></div>
-    <!-- 头像：把你的透明 PNG 放本目录改名 avatar.png，去掉下面那行注释、删掉"张"字即可 -->
-    <div class="holo-avatar"><!-- <img src="avatar.png" alt="头像"> -->张</div>
+    <div class="holo-avatar">张</div>
     <div class="holo-scan"></div>
   </div>
   <h1 class="hero-name" id="typeTarget"></h1>
