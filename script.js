@@ -273,11 +273,19 @@ document.querySelectorAll('.tilt').forEach(card => {
 const workReader = document.getElementById('workReader');
 const readerClose = document.getElementById('readerClose');
 const readerTitle = document.getElementById('readerTitle');
-const manualCards = document.querySelectorAll('.work-card-portal[data-manual]');
+const externalWorkContent = document.getElementById('externalWorkContent');
+const externalWorkFrame = document.getElementById('externalWorkFrame');
+const externalWorkTitle = document.getElementById('externalWorkTitle');
+const externalWorkDesc = document.getElementById('externalWorkDesc');
+const externalWorkLink = document.getElementById('externalWorkLink');
+const portalCards = document.querySelectorAll('.work-card-portal[data-manual]');
 let activeManualCard = null;
 let readerCloseTimer = null;
 
 const manualTitles = {
+  market: '每日盯盘 · 3D Market Deck',
+  starship: '星舰 V3 · 工程级 3D 交付',
+  moore: '摩尔线程产品介绍 · 互动演示',
   deepseek: 'DeepSeek V4 Flash PD 分离部署手册',
   glm: 'GLM5.2 PD 部署操作手册'
 };
@@ -286,20 +294,34 @@ function openManual(manual, card) {
   if (!workReader || !manual) return;
   clearTimeout(readerCloseTimer);
   activeManualCard = card || document.querySelector(`.work-card-portal[data-manual="${manual}"]`);
+  const externalUrl = activeManualCard?.dataset.workUrl;
+  const cardTitle = activeManualCard?.querySelector('h3')?.textContent?.trim();
+  const cardDesc = activeManualCard?.querySelector('p')?.textContent?.trim();
 
-  manualCards.forEach(item => {
+  portalCards.forEach(item => {
     item.classList.remove('is-returning');
     item.classList.toggle('is-diving', item === activeManualCard);
   });
 
   document.querySelectorAll('[data-manual-content]').forEach(content => {
-    content.classList.toggle('is-active', content.dataset.manualContent === manual);
+    content.classList.toggle('is-active', !externalUrl && content.dataset.manualContent === manual);
   });
+  externalWorkContent?.classList.toggle('is-active', Boolean(externalUrl));
+
+  if (externalUrl) {
+    if (externalWorkTitle) externalWorkTitle.textContent = cardTitle || manualTitles[manual] || '作品预览';
+    if (externalWorkDesc) externalWorkDesc.textContent = cardDesc || '原作品页面会在这里直接打开；如果浏览器限制嵌入，可使用备用入口新窗口查看。';
+    if (externalWorkLink) externalWorkLink.href = externalUrl;
+    if (externalWorkFrame && externalWorkFrame.src !== externalUrl) externalWorkFrame.src = externalUrl;
+  } else if (externalWorkFrame) {
+    externalWorkFrame.removeAttribute('src');
+  }
 
   if (readerTitle) readerTitle.textContent = manualTitles[manual] || '作品详情';
   workReader.hidden = false;
   workReader.setAttribute('aria-hidden', 'false');
   workReader.classList.remove('is-closing');
+  workReader.classList.toggle('has-frame', Boolean(externalUrl));
   document.body.classList.add('reader-open');
 
   requestAnimationFrame(() => {
@@ -322,8 +344,11 @@ function closeManual() {
     workReader.hidden = true;
     workReader.setAttribute('aria-hidden', 'true');
     workReader.classList.remove('is-closing');
+    workReader.classList.remove('has-frame');
     document.body.classList.remove('reader-open');
     document.querySelectorAll('[data-manual-content]').forEach(content => content.classList.remove('is-active'));
+    externalWorkContent?.classList.remove('is-active');
+    if (externalWorkFrame) externalWorkFrame.removeAttribute('src');
     if (activeManualCard) {
       activeManualCard.focus({ preventScroll: true });
       activeManualCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -332,7 +357,7 @@ function closeManual() {
   }, 430);
 }
 
-manualCards.forEach(card => {
+portalCards.forEach(card => {
   card.addEventListener('click', event => {
     const manual = event.target.closest('[data-manual-open]')?.dataset.manualOpen || card.dataset.manual;
     openManual(manual, card);
