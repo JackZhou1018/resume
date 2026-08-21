@@ -269,6 +269,90 @@ document.querySelectorAll('.tilt').forEach(card => {
   card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0)'; });
 });
 
+/* ---------- 作品卡片：翻转坠入详情 ---------- */
+const workReader = document.getElementById('workReader');
+const readerClose = document.getElementById('readerClose');
+const readerTitle = document.getElementById('readerTitle');
+const manualCards = document.querySelectorAll('.work-card-portal[data-manual]');
+let activeManualCard = null;
+let readerCloseTimer = null;
+
+const manualTitles = {
+  deepseek: 'DeepSeek V4 Flash PD 分离部署手册',
+  glm: 'GLM5.2 PD 部署操作手册'
+};
+
+function openManual(manual, card) {
+  if (!workReader || !manual) return;
+  clearTimeout(readerCloseTimer);
+  activeManualCard = card || document.querySelector(`.work-card-portal[data-manual="${manual}"]`);
+
+  manualCards.forEach(item => {
+    item.classList.remove('is-returning');
+    item.classList.toggle('is-diving', item === activeManualCard);
+  });
+
+  document.querySelectorAll('[data-manual-content]').forEach(content => {
+    content.classList.toggle('is-active', content.dataset.manualContent === manual);
+  });
+
+  if (readerTitle) readerTitle.textContent = manualTitles[manual] || '作品详情';
+  workReader.hidden = false;
+  workReader.setAttribute('aria-hidden', 'false');
+  workReader.classList.remove('is-closing');
+  document.body.classList.add('reader-open');
+
+  requestAnimationFrame(() => {
+    workReader.classList.add('is-open');
+    readerClose?.focus({ preventScroll: true });
+  });
+}
+
+function closeManual() {
+  if (!workReader || workReader.hidden) return;
+  workReader.classList.add('is-closing');
+  workReader.classList.remove('is-open');
+
+  if (activeManualCard) {
+    activeManualCard.classList.remove('is-diving');
+    activeManualCard.classList.add('is-returning');
+  }
+
+  readerCloseTimer = setTimeout(() => {
+    workReader.hidden = true;
+    workReader.setAttribute('aria-hidden', 'true');
+    workReader.classList.remove('is-closing');
+    document.body.classList.remove('reader-open');
+    document.querySelectorAll('[data-manual-content]').forEach(content => content.classList.remove('is-active'));
+    if (activeManualCard) {
+      activeManualCard.focus({ preventScroll: true });
+      activeManualCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => activeManualCard?.classList.remove('is-returning'), 520);
+    }
+  }, 430);
+}
+
+manualCards.forEach(card => {
+  card.addEventListener('click', event => {
+    const manual = event.target.closest('[data-manual-open]')?.dataset.manualOpen || card.dataset.manual;
+    openManual(manual, card);
+  });
+  card.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openManual(card.dataset.manual, card);
+    }
+  });
+});
+
+readerClose?.addEventListener('click', closeManual);
+workReader?.addEventListener('click', event => {
+  if (event.target === workReader) closeManual();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && workReader && !workReader.hidden) closeManual();
+});
+
 /* ---------- 联系按钮：复制 + 音效 ---------- */
 function beep() {
   try {

@@ -151,22 +151,103 @@
       <div class="work-tags"><span>28 页</span><span>HTML + PPTX</span><span>S5000 专题</span></div>
       <a class="work-link" href="https://jackzhou1018.github.io/Jack_Zhou_resume/moore-threads/index.html" target="_blank" rel="noreferrer">查看作品 →</a>
     </article>
-    <article class="work-card">
+    <article class="work-card work-card-portal" data-manual="deepseek" tabindex="0" role="button" aria-label="打开 DeepSeek V4 Flash PD 分离部署手册">
       <div class="work-head"><span>DS-V4</span><em>SGLang / PD 分离</em></div>
       <h3>DeepSeek V4 Flash PD 分离部署手册</h3>
       <p>将 DeepSeek V4 Flash 在 MUSA/SGLang 环境下的 Prefill、Decode、Router 分离部署流程整理成客户可执行手册，覆盖容器创建、一键拉起、日志定位、OpenAI 兼容接口验证和停服回滚。</p>
       <div class="work-tags"><span>3P1D + Router</span><span>容器化部署</span><span>客户手册</span></div>
-      <a class="work-link" href="docs/deepseek-v4-flash-pd.html">查看手册 →</a>
+      <span class="work-link work-open" data-manual-open="deepseek">点击卡片进入 →</span>
     </article>
-    <article class="work-card">
+    <article class="work-card work-card-portal" data-manual="glm" tabindex="0" role="button" aria-label="打开 GLM5.2 PD 部署操作手册">
       <div class="work-head"><span>GLM5.2</span><em>P3D4 / 长上下文</em></div>
       <h3>GLM5.2 PD 部署操作手册</h3>
       <p>面向 GLM5.2 FP8 模型的多节点 P/D 分离推理部署，沉淀拓扑说明、容器启动、通用环境变量、Prefill/Decode/Router 脚本、流式问答验证与日志排障路径。</p>
       <div class="work-tags"><span>P3D4 拓扑</span><span>256K 上下文</span><span>流式验证</span></div>
-      <a class="work-link" href="docs/glm5-2-pd.html">查看手册 →</a>
+      <span class="work-link work-open" data-manual-open="glm">点击卡片进入 →</span>
     </article>
   </div>
 </section>
+
+<aside class="work-reader" id="workReader" aria-hidden="true" hidden>
+  <div class="reader-tunnel" aria-hidden="true"></div>
+  <div class="reader-panel" role="dialog" aria-modal="true" aria-labelledby="readerTitle">
+    <header class="reader-head">
+      <div>
+        <p class="ai-eyebrow">PORTAL VIEW // CURRENT PAGE</p>
+        <h2 id="readerTitle">作品详情</h2>
+      </div>
+      <button class="reader-close" id="readerClose" type="button">退出作品 ↩</button>
+    </header>
+
+    <article class="reader-content" data-manual-content="deepseek">
+      <section class="reader-hero">
+        <span>DS-V4 FLASH</span>
+        <h3>DeepSeek V4 Flash PD 分离部署手册</h3>
+        <p>把 Prefill、Decode、Router 拆成可执行部署链路，用工程化 SOP 覆盖容器环境、启动顺序、OpenAI 兼容验证、日志定位和停服回滚。公开展示版已脱敏处理，保留方法论和交付结构。</p>
+      </section>
+      <div class="reader-metrics">
+        <span><strong>3P1D</strong>推理拓扑</span>
+        <span><strong>Router</strong>统一入口</span>
+        <span><strong>SGLang</strong>服务框架</span>
+        <span><strong>SOP</strong>客户可执行</span>
+      </div>
+      <div class="reader-grid">
+        <section>
+          <h4>交付价值</h4>
+          <p>把复杂模型部署拆成“环境确认 → 容器启动 → 服务拉起 → 接口验证 → 日志排障 → 停服回滚”的闭环，减少现场沟通成本。</p>
+        </section>
+        <section>
+          <h4>技术重点</h4>
+          <p>关注 P/D 分离拓扑、Router 转发关系、GPU 资源隔离、服务健康检查和 OpenAI 兼容接口验证，便于客户按步骤复现。</p>
+        </section>
+        <section>
+          <h4>可复用沉淀</h4>
+          <p>把一次部署经验整理成标准手册模板，后续同类型模型、同类集群、同类客户 POC 可以快速复用。</p>
+        </section>
+      </div>
+      <ol class="reader-steps">
+        <li><b>01</b><span>确认基础环境、容器镜像和模型目录。</span></li>
+        <li><b>02</b><span>按 Prefill、Decode、Router 顺序拉起服务。</span></li>
+        <li><b>03</b><span>用兼容接口完成非流式、流式和异常路径验证。</span></li>
+        <li><b>04</b><span>定位日志、保存证据、执行停服或回滚。</span></li>
+      </ol>
+    </article>
+
+    <article class="reader-content" data-manual-content="glm">
+      <section class="reader-hero">
+        <span>GLM5.2 FP8</span>
+        <h3>GLM5.2 PD 部署操作手册</h3>
+        <p>面向长上下文推理场景，整理多节点 P/D 分离部署流程，覆盖拓扑规划、容器启动、通用环境变量、脚本化拉起、流式问答验证与日志排障。</p>
+      </section>
+      <div class="reader-metrics">
+        <span><strong>P3D4</strong>多节点拓扑</span>
+        <span><strong>256K</strong>长上下文</span>
+        <span><strong>FP8</strong>模型部署</span>
+        <span><strong>Stream</strong>流式验证</span>
+      </div>
+      <div class="reader-grid">
+        <section>
+          <h4>交付价值</h4>
+          <p>把多节点推理部署从“经验口述”变成结构化手册，明确角色分工、启动顺序、验证方法和排障入口。</p>
+        </section>
+        <section>
+          <h4>技术重点</h4>
+          <p>强调 Prefill/Decode/Router 的分工、跨节点协同、长上下文能力验证、流式响应稳定性和日志链路。</p>
+        </section>
+        <section>
+          <h4>可复用沉淀</h4>
+          <p>沉淀为客户交付模板后，可用于同类大模型 POC、集群扩容、售后复盘和新人交接。</p>
+        </section>
+      </div>
+      <ol class="reader-steps">
+        <li><b>01</b><span>规划 P/D 节点角色、模型位置和服务端口。</span></li>
+        <li><b>02</b><span>统一环境变量与容器参数，降低节点差异。</span></li>
+        <li><b>03</b><span>逐层验证 Router、Decode、Prefill 的健康状态。</span></li>
+        <li><b>04</b><span>完成长上下文与流式问答测试，输出验收结论。</span></li>
+      </ol>
+    </article>
+  </div>
+</aside>
 
 <section class="section" id="projects">
   <h2 class="section-title"><span class="glitch-h">代表项目</span><span class="section-en">// KEY PROJECTS</span></h2>
