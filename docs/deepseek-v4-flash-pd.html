@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepSeek V4 Flash PD 分离部署手册 · Jack Zhou</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="doc-page">
+<div class="bg-grid-doc"></div>
+<main class="doc-shell">
+  <a class="doc-back" href="../index.html#aicoding">← 返回 AI Coding 作品集</a>
+  <section class="doc-hero">
+    <p class="ai-eyebrow">SGLang / MUSA / PD Disaggregation</p>
+    <h1>DeepSeek V4 Flash PD 分离部署手册</h1>
+    <p>公开展示版。该手册来自真实客户交付场景，重点展示多节点推理服务拆分、自动化脚本封装、日志与接口验证流程。内部地址、路径、端口、密钥和完整脚本已做脱敏处理。</p>
+    <div class="doc-metrics">
+      <span><strong>3P1D</strong>Prefill / Decode 拆分</span>
+      <span><strong>Router</strong>OpenAI 兼容入口</span>
+      <span><strong>FP8</strong>模型推理部署</span>
+      <span><strong>Runbook</strong>客户可执行手册</span>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>1. 部署架构</h2>
+    <div class="doc-topology">
+      <div><b>Prefill Group</b><span>多节点负责长上下文 Prefill 计算</span></div>
+      <div><b>Decode Node</b><span>独立 Decode 节点负责持续生成</span></div>
+      <div><b>Router</b><span>统一暴露 OpenAI 兼容接口</span></div>
+    </div>
+    <p>架构采用 P/D 分离：Prefill 侧负责大块上下文计算，Decode 侧负责 token 生成，Router 侧屏蔽后端拓扑，对客户提供稳定访问入口。</p>
+  </section>
+
+  <section class="doc-card">
+    <h2>2. 交付内容</h2>
+    <ul class="doc-list">
+      <li>容器创建脚本：统一镜像、GPU/MUSA 能力、共享存储挂载与容器间通信准备。</li>
+      <li>一键拉起脚本：按顺序启动 Prefill、Decode 和 Router，降低客户误操作概率。</li>
+      <li>停止脚本：精确清理推理服务相关进程，避免影响其他系统服务。</li>
+      <li>日志规范：按角色拆分 Prefill、Decode、Router 日志，方便定位启动失败、端口占用和 worker 等待问题。</li>
+      <li>验证命令：提供模型列表、简单问答、OpenAI 兼容接口调用与服务健康检查。</li>
+    </ul>
+  </section>
+
+  <section class="doc-card">
+    <h2>3. 标准操作流程</h2>
+    <div class="doc-steps">
+      <div><span>01</span><p>确认模型、镜像、共享存储和节点连通性。</p></div>
+      <div><span>02</span><p>创建或刷新推理容器，完成容器间免密和基础环境初始化。</p></div>
+      <div><span>03</span><p>先清理旧服务，再执行一键拉起脚本提交 PD/R 服务。</p></div>
+      <div><span>04</span><p>跟踪各角色日志，确认 worker、Router 和接口全部就绪。</p></div>
+      <div><span>05</span><p>用模型列表和 chat completions 请求验证业务链路。</p></div>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>4. 技术亮点</h2>
+    <div class="doc-grid">
+      <article><h3>分离式推理</h3><p>将 Prefill 与 Decode 角色显式拆分，提升长上下文请求下的资源调度清晰度。</p></article>
+      <article><h3>客户可执行</h3><p>把复杂部署动作收敛成容器创建、启动、验证、停止四类命令，降低交接成本。</p></article>
+      <article><h3>可观测性</h3><p>通过角色日志和接口验证命令建立标准排障路径，便于现场快速定位。</p></article>
+      <article><h3>安全边界</h3><p>停服脚本只匹配推理相关进程，避免误杀 DCGM、监控或其他业务服务。</p></article>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>5. 验收标准</h2>
+    <ul class="doc-list">
+      <li>Router 健康检查正常，模型列表接口可返回目标模型。</li>
+      <li>简单问答请求可稳定返回内容。</li>
+      <li>Prefill、Decode、Router 日志均无阻断性错误。</li>
+      <li>停服脚本执行后无残留推理服务进程。</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

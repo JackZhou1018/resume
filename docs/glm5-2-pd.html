@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLM5.2 PD 部署操作手册 · Jack Zhou</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="doc-page">
+<div class="bg-grid-doc"></div>
+<main class="doc-shell">
+  <a class="doc-back" href="../index.html#aicoding">← 返回 AI Coding 作品集</a>
+  <section class="doc-hero">
+    <p class="ai-eyebrow">GLM5.2 / P3D4 / Long Context</p>
+    <h1>GLM5.2 PD 部署操作手册</h1>
+    <p>公开展示版。该手册面向 GLM5.2 FP8 多节点推理部署，展示从拓扑规划、容器启动、通用环境变量、P/D 角色脚本到流式问答验证的完整交付链路。内部环境信息已脱敏。</p>
+    <div class="doc-metrics">
+      <span><strong>P3D4</strong>Prefill / Decode 拓扑</span>
+      <span><strong>256K</strong>长上下文配置</span>
+      <span><strong>FP8</strong>推理优化</span>
+      <span><strong>Stream</strong>流式问答验证</span>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>1. 部署拓扑</h2>
+    <div class="doc-topology doc-topology-wide">
+      <div><b>Prefill x 3</b><span>三节点承担长上下文 Prefill，支持上下文并行与流水分层。</span></div>
+      <div><b>Decode x 4</b><span>四节点承担 Decode，支持持续生成和并发请求。</span></div>
+      <div><b>Router</b><span>统一入口，负责请求转发、worker 等待和 OpenAI 兼容接口。</span></div>
+      <div><b>Logs</b><span>按运行批次输出拓扑、角色日志、指标与验证结果。</span></div>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>2. 交付内容</h2>
+    <ul class="doc-list">
+      <li>容器启动方案：统一镜像、MUSA 能力、共享目录、容器内 SSH 和目标节点检查。</li>
+      <li>公共环境脚本：集中管理通信、MUSA、SGLang、DeepEP、上下文长度和缓存相关变量。</li>
+      <li>Prefill 脚本：配置 TP/EP/PP、长上下文、chunked prefill、指标导出和 P/D 通信。</li>
+      <li>Decode 脚本：配置 DP attention、EAGLE 推测解码、显存比例和 Decode 角色端口。</li>
+      <li>Router 脚本：启用 PD disaggregation，配置 worker 等待、超时、调度策略和统一端口。</li>
+      <li>验证脚本：用流式问答确认 token 持续输出，并统计首 token 延迟、总耗时和 chunk 数。</li>
+    </ul>
+  </section>
+
+  <section class="doc-card">
+    <h2>3. 运行顺序</h2>
+    <div class="doc-steps">
+      <div><span>01</span><p>读取 hostfile，确认 Prefill 和 Decode 节点数量满足拓扑要求。</p></div>
+      <div><span>02</span><p>检查目标容器是否存在且运行，避免在错误环境下拉起服务。</p></div>
+      <div><span>03</span><p>按 rank 启动 Prefill 节点，生成独立日志。</p></div>
+      <div><span>04</span><p>按 rank 启动 Decode 节点，继承统一上下文和推测解码配置。</p></div>
+      <div><span>05</span><p>在入口节点启动 Router，并通过健康检查和流式问答验收。</p></div>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>4. 技术亮点</h2>
+    <div class="doc-grid">
+      <article><h3>长上下文工程化</h3><p>围绕 64K/128K/256K 上下文配置，梳理 Prefill、Decode 和 Router 的一致性参数。</p></article>
+      <article><h3>脚本化拓扑</h3><p>将 P3D4 拓扑、rank、日志目录和模型路径参数化，减少现场手工配置。</p></article>
+      <article><h3>流式验证</h3><p>用标准 chat completions 流式请求验证端到端链路，而不是只看端口存活。</p></article>
+      <article><h3>排障闭环</h3><p>沉淀日志位置、停服脚本和残留进程检查，便于客户交接后独立运维。</p></article>
+    </div>
+  </section>
+
+  <section class="doc-card">
+    <h2>5. 验收标准</h2>
+    <ul class="doc-list">
+      <li>Prefill、Decode、Router 三类服务均能按拓扑启动。</li>
+      <li>健康检查正常，模型接口可访问。</li>
+      <li>流式问答持续输出 token，并正常结束。</li>
+      <li>日志目录可追踪每个角色的启动与运行状态。</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
