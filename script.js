@@ -232,7 +232,7 @@ function frame(t) {
 requestAnimationFrame(frame);
 
 /* ---------- 打字机姓名 ---------- */
-const nameText = '张小明';
+const nameText = '周猛 · Jack Zhou';
 const typeEl = document.getElementById('typeTarget');
 let idx = 0;
 function typeName() {
@@ -302,4 +302,3 @@ setTimeout(() => {
   const overlay = document.getElementById('glitchOverlay');
   if (overlay) overlay.style.display = 'none';
 }, 2400);
-

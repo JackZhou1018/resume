@@ -3,121 +3,206 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>张小明 · 全栈工程师 · 硬核科技主页</title>
+<meta name="description" content="周猛 Jack Zhou，FAE 工程师，AI 算力技术支持，聚焦 GPU 服务器、国产化适配、大模型训推、集群交付与客户 POC。">
+<title>周猛 Jack Zhou · FAE 工程师 · AI 算力技术支持</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ============ 加载转场：全屏故障艺术 ============ -->
 <div class="glitch-overlay" id="glitchOverlay">
-  <div class="glitch-text" data-text="INITIALIZING">INITIALIZING</div>
-  <div class="glitch-sub">LOADING PROFILE // 01001010</div>
+  <div class="glitch-text" data-text="JACK ZHOU">JACK ZHOU</div>
+  <div class="glitch-sub">AI COMPUTE FAE // PROFILE ONLINE</div>
 </div>
 
-<!-- ============ 视频背景（把 bg.mp4 放本目录即可；没有则显示星空+黑洞）============ -->
 <video class="bg-video" id="bgVideo" autoplay muted loop playsinline>
   <source src="bg.mp4" type="video/mp4">
 </video>
 
-<!-- ============ 背景动效画布（星空叠加层）============ -->
 <canvas id="bgCanvas"></canvas>
 
-<!-- ============ 导航栏 ============ -->
 <nav class="nav" id="nav">
-  <div class="nav-logo">&gt;_ XIAOMING<span class="cursor">▊</span></div>
+  <div class="nav-logo">&gt;_ JACK.ZHOU<span class="cursor">▊</span></div>
   <ul class="nav-links">
     <li><a href="#hero">首页</a></li>
-    <li><a href="#skills">技能</a></li>
+    <li><a href="#skills">能力</a></li>
     <li><a href="#projects">项目</a></li>
+    <li><a href="#experience">经历</a></li>
     <li><a href="#contact">联系</a></li>
   </ul>
 </nav>
 
-<!-- ============ Hero ============ -->
 <header class="hero" id="hero">
   <div class="hologram">
     <div class="holo-ring"></div>
-    <div class="holo-avatar">张</div>
+    <div class="holo-avatar">周</div>
     <div class="holo-scan"></div>
   </div>
+  <p class="hero-kicker">FAE Engineer · AI Compute · Beijing</p>
   <h1 class="hero-name" id="typeTarget"></h1>
   <div class="hero-tags">
-    <span class="tag">全栈工程师</span>
-    <span class="tag">WEBGL / THREE.JS</span>
-    <span class="tag">CREATIVE DEVELOPER</span>
+    <span class="tag">GPU 服务器 POC</span>
+    <span class="tag">大模型训推适配</span>
+    <span class="tag">国产化集群交付</span>
   </div>
-  <p class="hero-desc">用代码构建赛博世界的造梦师 // Building the future, one commit at a time.</p>
+  <p class="hero-desc">
+    近 10 年服务器硬件与 AI 算力技术服务经验，覆盖联想、同方、摩尔线程。长期负责大客户 POC、OEM 适配、GPU 服务器交付、RoCE 组网、故障闭环与跨部门项目推进。
+  </p>
+  <div class="hero-metrics">
+    <div><strong>500+</strong><span>AI 服务器交付</span></div>
+    <div><strong>5+</strong><span>头部客户 POC</span></div>
+    <div><strong>40万+</strong><span>GPU 图形卡订单</span></div>
+    <div><strong>50+</strong><span>展会 Demo 支持</span></div>
+  </div>
   <div class="hero-cta">
-    <a href="#projects" class="btn btn-primary">查看作品 →</a>
+    <a href="#projects" class="btn btn-primary">查看项目战绩 →</a>
     <a href="#contact" class="btn btn-ghost">联系我</a>
   </div>
 </header>
 
-<!-- ============ Skills ============ -->
-<section class="section" id="skills">
-  <h2 class="section-title"><span class="glitch-h">技能矩阵</span><span class="section-en">// SKILLS</span></h2>
-  <div class="skills-grid">
-    <!-- 环形进度条：JS 根据 data-value 填充 -->
-    <div class="skill-ring" data-value="95"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>95%</strong><span>Vue / React</span></div></div>
-    <div class="skill-ring" data-value="90"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>90%</strong><span>TypeScript</span></div></div>
-    <div class="skill-ring" data-value="85"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>85%</strong><span>Node.js</span></div></div>
-    <div class="skill-ring" data-value="80"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>80%</strong><span>Three.js / WebGL</span></div></div>
-    <div class="skill-ring" data-value="88"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>88%</strong><span>CSS3 动效</span></div></div>
+<section class="section profile-section" id="profile">
+  <h2 class="section-title"><span class="glitch-h">个人定位</span><span class="section-en">// PROFILE</span></h2>
+  <div class="summary-panel">
+    <p>
+      我更偏现场攻坚型 FAE：能把客户需求翻译成可执行测试项，也能落到服务器、驱动、系统、网络、模型适配和批量交付细节。核心优势是把售前 POC、技术验证、交付上线、问题闭环和项目复盘串成一条完整链路。
+    </p>
+    <div class="summary-grid">
+      <span>北京</span>
+      <span>FAE 工程师</span>
+      <span>AI 算力技术支持</span>
+      <span>期望 35-45K</span>
+    </div>
   </div>
 </section>
 
-<!-- ============ Projects ============ -->
+<section class="section" id="skills">
+  <h2 class="section-title"><span class="glitch-h">能力矩阵</span><span class="section-en">// CAPABILITY MATRIX</span></h2>
+  <div class="skills-grid">
+    <div class="skill-ring" data-value="96"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>96%</strong><span>GPU POC</span></div></div>
+    <div class="skill-ring" data-value="92"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>92%</strong><span>集群交付</span></div></div>
+    <div class="skill-ring" data-value="90"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>90%</strong><span>硬件测试</span></div></div>
+    <div class="skill-ring" data-value="88"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>88%</strong><span>模型适配</span></div></div>
+    <div class="skill-ring" data-value="86"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>86%</strong><span>RoCE/信创</span></div></div>
+  </div>
+  <div class="chip-grid">
+    <span>麒麟 / Ubuntu / Linux</span>
+    <span>MUSA / GPU 驱动</span>
+    <span>RoCE 网络</span>
+    <span>BIOS / BMC / IPMI</span>
+    <span>RMA 故障闭环</span>
+    <span>AI 辅助脚本与工具化</span>
+  </div>
+</section>
+
 <section class="section" id="projects">
-  <h2 class="section-title"><span class="glitch-h">精选项目</span><span class="section-en">// PROJECTS</span></h2>
+  <h2 class="section-title"><span class="glitch-h">代表项目</span><span class="section-en">// KEY PROJECTS</span></h2>
   <div class="projects-grid">
     <article class="proj-card tilt">
-      <div class="proj-bg">🛰️</div>
+      <div class="proj-bg">JD</div>
       <div class="proj-body">
-        <h3>数据可视化大屏</h3>
-        <p>ECharts + WebSocket 实时数据大屏，峰值 10 万 QPS。</p>
+        <h3>京东云及零售 GPU 服务器项目</h3>
+        <p>主导 POC、送测准入、基准验证、大模型训推适配，负责 500+ 台 AI 服务器批量交付。</p>
       </div>
-      <div class="proj-overlay"><span>WEBGL / 实时渲染</span><a href="#">查看详情 →</a></div>
+      <div class="proj-overlay"><span>2026.06 至今 · 云/零售</span><a href="#contact">FAE 技术支持</a></div>
     </article>
     <article class="proj-card tilt">
-      <div class="proj-bg">🤖</div>
+      <div class="proj-bg">MT</div>
       <div class="proj-body">
-        <h3>AI 智能客服中台</h3>
-        <p>大模型 RAG 客服系统，自动应答率 85%。</p>
+        <h3>美团互联网客户 POC</h3>
+        <p>覆盖 Llama3 训练、DeepSeek 671B 双机推理、AI 平台和搜广推模型适配，客户满意度 98%。</p>
       </div>
-      <div class="proj-overlay"><span>LLM / RAG</span><a href="#">查看详情 →</a></div>
+      <div class="proj-overlay"><span>2025.10 至今 · 互联网</span><a href="#contact">年度算力集采中标</a></div>
     </article>
     <article class="proj-card tilt">
-      <div class="proj-bg">🌐</div>
+      <div class="proj-bg">KS</div>
       <div class="proj-body">
-        <h3>赛博城市 3D 场景</h3>
-        <p>Three.js 打造的未来都市，粒子霓虹夜景。</p>
+        <h3>快手 GPU 板卡/服务器 POC</h3>
+        <p>统筹送测准入、整机联调、功耗温控基线、大模型训练/推理适配，输出上线校验标准。</p>
       </div>
-      <div class="proj-overlay"><span>THREE.JS</span><a href="#">查看详情 →</a></div>
+      <div class="proj-overlay"><span>2025.04 至今 · POC 负责人</span><a href="#contact">客户选型验收通过</a></div>
     </article>
     <article class="proj-card tilt">
-      <div class="proj-bg">📱</div>
+      <div class="proj-bg">CETC</div>
       <div class="proj-body">
-        <h3>小程序电商商城</h3>
-        <p>日活 3 万+，从 0 到 1 的完整交付。</p>
+        <h3>中电科智能院 AI 算力集群</h3>
+        <p>技术评分第一中标，完成 Qwen、DeepSeek-R1、WAN、GLM 等 9 款主流大模型适配调优。</p>
       </div>
-      <div class="proj-overlay"><span>MINI-PROGRAM</span><a href="#">查看详情 →</a></div>
+      <div class="proj-overlay"><span>2025.10 至今 · 央国企</span><a href="#contact">集群交付</a></div>
+    </article>
+    <article class="proj-card tilt">
+      <div class="proj-bg">10W</div>
+      <div class="proj-body">
+        <h3>邮储银行 GPU 图形卡集采</h3>
+        <p>协助信创 GPU 产品需求调研、兼容性测试与投标材料筹备，支撑 10 万张订单落地。</p>
+      </div>
+      <div class="proj-overlay"><span>2022.03-2022.09 · 金融</span><a href="#contact">信创适配</a></div>
+    </article>
+    <article class="proj-card tilt">
+      <div class="proj-bg">30W</div>
+      <div class="proj-body">
+        <h3>工行/移动终端集采</h3>
+        <p>自研 GPU 图形卡终端场景适配验证与问题排查，通过集采技术资质审核，约 30 万张订单。</p>
+      </div>
+      <div class="proj-overlay"><span>2023.02-2024.11 · 金融/运营商</span><a href="#contact">技术资质审核</a></div>
     </article>
   </div>
 </section>
 
-<!-- ============ Contact ============ -->
+<section class="section" id="experience">
+  <h2 class="section-title"><span class="glitch-h">工作经历</span><span class="section-en">// EXPERIENCE</span></h2>
+  <div class="timeline">
+    <article class="timeline-item">
+      <div class="timeline-date">2021.11 - 至今</div>
+      <div class="timeline-card">
+        <h3>摩尔线程智能科技（北京）股份有限公司</h3>
+        <p class="timeline-role">FAE · 人工智能硬件</p>
+        <ul>
+          <li>负责 AI GPU 产品全生命周期技术服务，覆盖大客户 POC、OEM 适配、服务器交付与故障闭环。</li>
+          <li>推进 3 家头部 OEM 客户量产，支撑 10+ 个大型项目落地。</li>
+          <li>搭建机房交付流程：系统安装、GPU 驱动、RoCE 组网、RMA 与跨部门推进。</li>
+        </ul>
+      </div>
+    </article>
+    <article class="timeline-item">
+      <div class="timeline-date">2019.11 - 2021.11</div>
+      <div class="timeline-card">
+        <h3>北京同方信息安全股份有限公司</h3>
+        <p class="timeline-role">测试运维 · 计算机硬件</p>
+        <ul>
+          <li>负责硬件产品测试计划、功能/性能/兼容性验证、故障定位与测试报告输出。</li>
+          <li>联动研发、生产、质量团队处理交付问题，保障产品稳定上线。</li>
+        </ul>
+      </div>
+    </article>
+    <article class="timeline-item">
+      <div class="timeline-date">2017.03 - 2019.11</div>
+      <div class="timeline-card">
+        <h3>联想北京信息技术有限公司</h3>
+        <p class="timeline-role">测试开发 · 计算机硬件</p>
+        <ul>
+          <li>完成 30+ 款服务器硬件测试，覆盖 CPU、内存、存储、背板、BIOS/BMC、系统兼容性与可靠性。</li>
+          <li>熟悉 IPMI、WebUI、远程部署和多操作系统测试环境。</li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</section>
+
 <section class="section" id="contact">
   <h2 class="section-title"><span class="glitch-h">与我联系</span><span class="section-en">// CONTACT</span></h2>
+  <div class="contact-card">
+    <p>周猛 / Jack Zhou</p>
+    <p>FAE 工程师 · AI 算力技术支持 · 北京</p>
+  </div>
   <div class="contact-row">
-    <button class="contact-btn" data-copy="xiaoming@email.com" title="点击复制邮箱">📧</button>
-    <a class="contact-btn" href="https://github.com" target="_blank" title="GitHub">🐙</a>
-    <button class="contact-btn" data-copy="13800000000" title="点击复制电话">📞</button>
-    <a class="contact-btn" href="https://twitter.com" target="_blank" title="Twitter">🐦</a>
+    <button class="contact-btn" data-copy="1428614426@qq.com" title="点击复制邮箱">Mail</button>
+    <a class="contact-btn" href="https://github.com/jackzhou1018" target="_blank" rel="noreferrer" title="GitHub">Git</a>
+    <button class="contact-btn" data-copy="17609439323" title="点击复制电话">Tel</button>
+    <button class="contact-btn" data-copy="17609439323" title="点击复制微信">WeChat</button>
   </div>
   <p class="contact-tip" id="copyTip"></p>
 </section>
 
-<footer class="footer">© 2026 张小明 · 硬核科技风 · 原生 HTML/CSS/JS 构建</footer>
+<footer class="footer">© 2026 周猛 Jack Zhou · FAE Engineer · AI Compute</footer>
 
 <script src="script.js"></script>
 </body>
