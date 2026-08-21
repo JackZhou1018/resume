@@ -329,6 +329,150 @@ body {
   font-size: 12px;
 }
 
+/* ============ AI Coding Works ============ */
+.ai-hero-panel {
+  display: grid;
+  grid-template-columns: 1.35fr .85fr;
+  gap: 22px;
+  align-items: stretch;
+  margin-bottom: 24px;
+  padding: 28px;
+  border: 1px solid rgba(188,19,254,.28);
+  background:
+    linear-gradient(135deg, rgba(188,19,254,.12), rgba(0,243,255,.07)),
+    rgba(255,255,255,.035);
+  backdrop-filter: blur(14px);
+}
+
+.ai-eyebrow {
+  color: var(--cyan);
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.ai-hero-panel h3 {
+  font-family: var(--sans);
+  color: #fff;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+
+.ai-hero-panel p:not(.ai-eyebrow) {
+  margin-top: 12px;
+  color: #dce7f8;
+  font-size: 14px;
+}
+
+.ai-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ai-stats span {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 92px;
+  padding: 14px;
+  border: 1px solid var(--stroke);
+  background: rgba(0,0,0,.24);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ai-stats strong {
+  font-family: var(--sans);
+  color: var(--cyan);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.work-card {
+  min-height: 300px;
+  padding: 22px;
+  border: 1px solid rgba(0,243,255,.18);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(0,243,255,.12), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+  backdrop-filter: blur(12px);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+.work-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0,243,255,.55);
+  box-shadow: 0 0 34px rgba(0,243,255,.18);
+}
+
+.work-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.work-head span {
+  font-family: var(--sans);
+  color: var(--cyan);
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+
+.work-head em {
+  color: var(--purple);
+  font-style: normal;
+  font-size: 11px;
+}
+
+.work-card h3 {
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.work-card p {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.work-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.work-tags span {
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,.12);
+  color: #dfe8f7;
+  background: rgba(0,0,0,.24);
+  font-size: 11px;
+}
+
+.work-link {
+  display: inline-flex;
+  margin-top: 18px;
+  color: var(--cyan);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
 /* ============ Skills 环形进度 ============ */
 .skills-grid {
   display: flex; flex-wrap: wrap; gap: 30px;
@@ -536,6 +680,30 @@ body {
   }
   .section { padding: 62px 18px; }
   .summary-panel { padding: 22px; }
+  .ai-hero-panel {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+  .ai-hero-panel h3 {
+    font-size: 21px;
+  }
+  .ai-stats {
+    grid-template-columns: 1fr;
+  }
+  .works-grid {
+    grid-template-columns: 1fr;
+  }
+  .work-card {
+    min-height: auto;
+    padding: 20px;
+  }
+  .work-head {
+    display: block;
+  }
+  .work-head em {
+    display: block;
+    margin-top: 6px;
+  }
   .projects-grid { grid-template-columns: 1fr; }
   .timeline-item { grid-template-columns: 1fr; gap: 8px; }
   .timeline-date { padding-top: 0; }
