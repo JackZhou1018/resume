@@ -25,3 +25,10 @@
 - 新增 AI Coding 作品卡片「JARVIS 全息人形 · 3D Preview」，点击后通过 Portal 在当前页面打开。
 - 3D 页面包含半透明人形、胸口核心、环形数据轨道、粒子流、数据雨、Bloom 光效和 OrbitControls 旋转缩放。
 - 已本地验证：3D 页面 canvas 正常生成，控制台无 error/warning；Portal 打开/退出正常，URL 保持 `#aicoding`。
+
+## 2026-08-22 Apogee 背景更新
+
+- 根据用户提供的 Apogee hero 提示词，替换全站背景为指定 CloudFront 深蓝/红色星云视频。
+- 将页面底色改为 `#080A19`，移除首页原重暗遮罩，降低星空 canvas 干扰。
+- 将核心内容卡片、AI Coding 卡片、项目卡片、时间线和联系按钮统一为 Apogee 风格玻璃拟态：`rgba(17,16,15,.35)` + 20px blur + 弱白边。
+- 已本地验证：视频实际加载 CloudFront URL，播放状态正常；Portal 交互未受影响；控制台无 error/warning。

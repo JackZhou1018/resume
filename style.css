@@ -1,20 +1,20 @@
 /* ============================================================
    硬核科技风个人主页 · 样式表
-   色彩体系：深空黑(#050505) → 深蓝紫(#0a0a2e) 径向渐变
+   色彩体系：Apogee 深空底(#080A19) + 星云视频背景 + 玻璃拟态面板
    主色：霓虹青 #00f3ff | 辅色：电光紫 #bc13fe | 文字：银灰 #e0e0e0
    ============================================================ */
 
 :root {
-  --bg1: #050505;
-  --bg2: #0a0a2e;
+  --bg1: #080A19;
+  --bg2: #11101f;
   --cyan: #00f3ff;
   --purple: #bc13fe;
   --silver: #e0e0e0;
-  --muted: #9aa0b5;
-  --glass: rgba(255, 255, 255, 0.04);
-  --stroke: rgba(0, 243, 255, 0.18);
+  --muted: rgba(255, 255, 255, 0.78);
+  --glass: rgba(17, 16, 15, 0.35);
+  --stroke: rgba(255, 255, 255, 0.10);
   --mono: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
-  --sans: "Orbitron", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --sans: "Suisse Intl", "Orbitron", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,13 +22,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  /* 宇宙星空：深空径向渐变 + 多团星云光晕 + 暗角 */
-  background:
-    radial-gradient(ellipse at 12% 8%, rgba(0, 243, 255, .16), transparent 42%),
-    radial-gradient(ellipse at 88% 12%, rgba(188, 19, 254, .18), transparent 46%),
-    radial-gradient(ellipse at 80% 80%, rgba(58, 123, 213, .16), transparent 50%),
-    radial-gradient(ellipse at 18% 85%, rgba(244, 114, 182, .12), transparent 44%),
-    radial-gradient(ellipse at 50% 0%, var(--bg2) 0%, var(--bg1) 70%);
+  background: #080A19;
   color: var(--silver);
   font-family: var(--mono);
   line-height: 1.7;
@@ -43,7 +37,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.72;          /* 半透明，让内容更清晰 */
+  opacity: 1;
 }
 
 /* 星空叠加层（画布透明，星星浮在视频上） */
@@ -52,6 +46,8 @@ body {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: screen;
 }
 
 /* ============ 加载故障转场 ============ */
@@ -99,9 +95,9 @@ body {
 }
 /* 滚动后：模糊背景 + 高亮边框 */
 .nav.scrolled {
-  background: rgba(5, 5, 5, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(10, 7, 7, 0.35);
+  backdrop-filter: blur(17px);
+  -webkit-backdrop-filter: blur(17px);
   box-shadow: 0 1px 0 var(--stroke);
 }
 .nav-logo { font-family: var(--sans); font-weight: 700; color: var(--cyan); letter-spacing: 1px; }
@@ -148,7 +144,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(circle at 50% 48%, rgba(0,0,0,.18), rgba(0,0,0,.48) 62%, rgba(0,0,0,.62));
+  background: none;
 }
 
 /* 全息头像 */
@@ -237,8 +233,10 @@ body {
 .hero-metrics div {
   padding: 14px 16px;
   border: 1px solid var(--stroke);
-  background: rgba(255,255,255,.045);
-  backdrop-filter: blur(10px);
+  background: rgba(17,16,15,.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
 }
 
 .hero-metrics strong {
@@ -303,8 +301,10 @@ body {
   margin: 0 auto;
   padding: 28px;
   border: 1px solid var(--stroke);
-  background: linear-gradient(135deg, rgba(0,243,255,.08), rgba(188,19,254,.06));
-  backdrop-filter: blur(12px);
+  background: rgba(17,16,15,.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
 }
 
 .summary-panel p {
@@ -323,10 +323,11 @@ body {
 .summary-grid span,
 .chip-grid span {
   padding: 8px 13px;
-  border: 1px solid rgba(0,243,255,.28);
+  border: 1px solid rgba(255,255,255,.12);
   color: var(--cyan);
-  background: rgba(0,0,0,.24);
+  background: rgba(10,7,7,.35);
   font-size: 12px;
+  border-radius: 10px;
 }
 
 /* ============ AI Coding Works ============ */
@@ -337,11 +338,11 @@ body {
   align-items: stretch;
   margin-bottom: 24px;
   padding: 28px;
-  border: 1px solid rgba(188,19,254,.28);
-  background:
-    linear-gradient(135deg, rgba(188,19,254,.12), rgba(0,243,255,.07)),
-    rgba(255,255,255,.035);
-  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(17,16,15,.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
 }
 
 .ai-eyebrow {
@@ -379,9 +380,10 @@ body {
   min-height: 92px;
   padding: 14px;
   border: 1px solid var(--stroke);
-  background: rgba(0,0,0,.24);
+  background: rgba(10,7,7,.35);
   color: var(--muted);
   font-size: 12px;
+  border-radius: 14px;
 }
 
 .ai-stats strong {
@@ -401,19 +403,19 @@ body {
 .work-card {
   min-height: 300px;
   padding: 22px;
-  border: 1px solid rgba(0,243,255,.18);
-  background:
-    radial-gradient(circle at 12% 0%, rgba(0,243,255,.12), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(17,16,15,.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
   transform-style: preserve-3d;
   transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, opacity .25s ease, filter .25s ease;
 }
 
 .work-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(0,243,255,.55);
-  box-shadow: 0 0 34px rgba(0,243,255,.18);
+  border-color: rgba(255,255,255,.24);
+  box-shadow: 0 0 34px rgba(0,243,255,.14);
 }
 
 .work-card-portal {
@@ -521,8 +523,9 @@ body {
   padding: 6px 9px;
   border: 1px solid rgba(255,255,255,.12);
   color: #dfe8f7;
-  background: rgba(0,0,0,.24);
+  background: rgba(10,7,7,.35);
   font-size: 11px;
+  border-radius: 8px;
 }
 
 .work-link {
@@ -1058,10 +1061,11 @@ body.reader-open {
 }
 .proj-card {
   position: relative; min-height: 292px;
-  border-radius: 14px; overflow: hidden;
+  border-radius: 24px; overflow: hidden;
   background: var(--glass);
   border: 1px solid var(--stroke);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   transform-style: preserve-3d;
   transition: transform .25s ease, border-color .3s, box-shadow .3s;
   /* 呼吸灯边框 */
@@ -1086,7 +1090,9 @@ body.reader-open {
 /* 悬停详情遮罩 */
 .proj-overlay {
   position: absolute; inset: 0; z-index: 2;
-  background: linear-gradient(180deg, rgba(10,10,46,.9), rgba(188,19,254,.75));
+  background: rgba(8,10,25,.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 12px;
   opacity: 0; transition: opacity .3s;
@@ -1120,10 +1126,12 @@ body.reader-open {
 
 .timeline-card {
   border: 1px solid var(--stroke);
-  background: rgba(255,255,255,.045);
-  backdrop-filter: blur(12px);
+  background: rgba(17,16,15,.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 22px 24px;
   position: relative;
+  border-radius: 20px;
 }
 
 .timeline-card::before {
@@ -1171,7 +1179,9 @@ body.reader-open {
   width: 66px; height: 66px; border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
   font-size: 28px; text-decoration: none;
-  background: var(--glass); border: 1px solid var(--stroke);
+  background: rgba(17,16,15,.35); border: 1px solid var(--stroke);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   cursor: pointer; transition: .3s;
 }
 .contact-btn:hover {
