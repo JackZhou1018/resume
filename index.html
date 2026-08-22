@@ -47,6 +47,26 @@
       <b id="voiceStatus">点击唤醒</b>
       <span id="voiceTranscript">可问：项目、经历、AI Coding、联系方式</span>
     </div>
+    <button class="voice-settings-toggle" id="voiceSettingsToggle" type="button" aria-label="打开数字人声音设置">声音设置</button>
+    <div class="voice-settings" id="voiceSettings" hidden>
+      <label>
+        <span>声线</span>
+        <select id="voiceSelect"></select>
+      </label>
+      <label>
+        <span>语速 <em id="voiceRateValue">0.96</em></span>
+        <input id="voiceRate" type="range" min="0.75" max="1.15" step="0.01" value="0.96">
+      </label>
+      <label>
+        <span>音调 <em id="voicePitchValue">1.00</em></span>
+        <input id="voicePitch" type="range" min="0.80" max="1.20" step="0.01" value="1.00">
+      </label>
+      <div class="voice-settings-actions">
+        <button id="voiceTest" type="button">试听</button>
+        <button id="voiceSave" type="button">保存</button>
+        <button id="voiceReset" type="button">重置</button>
+      </div>
+    </div>
   </div>
   <p class="hero-kicker">FAE Engineer · AI Compute · Beijing</p>
   <h1 class="hero-name" id="typeTarget"></h1>

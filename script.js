@@ -384,22 +384,64 @@ const digitalHuman = document.getElementById('digitalHuman');
 const digitalHumanCanvas = document.getElementById('digitalHumanCanvas');
 const voiceStatus = document.getElementById('voiceStatus');
 const voiceTranscript = document.getElementById('voiceTranscript');
+const voiceSettingsToggle = document.getElementById('voiceSettingsToggle');
+const voiceSettings = document.getElementById('voiceSettings');
+const voiceSelect = document.getElementById('voiceSelect');
+const voiceRate = document.getElementById('voiceRate');
+const voicePitch = document.getElementById('voicePitch');
+const voiceRateValue = document.getElementById('voiceRateValue');
+const voicePitchValue = document.getElementById('voicePitchValue');
+const voiceTest = document.getElementById('voiceTest');
+const voiceSave = document.getElementById('voiceSave');
+const voiceReset = document.getElementById('voiceReset');
 let avatarSpeaking = false;
 let avatarListening = false;
 let preferredSweetVoice = null;
+const VOICE_SETTINGS_KEY = 'jackResumeVoiceSettings';
+const DEFAULT_VOICE_SETTINGS = {
+  voiceURI: '',
+  rate: 0.96,
+  pitch: 1.0,
+  volume: 1.0
+};
+let currentVoiceSettings = { ...DEFAULT_VOICE_SETTINGS };
+
+function loadVoiceSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(VOICE_SETTINGS_KEY) || 'null');
+    currentVoiceSettings = {
+      ...DEFAULT_VOICE_SETTINGS,
+      ...(saved || {})
+    };
+  } catch (e) {
+    currentVoiceSettings = { ...DEFAULT_VOICE_SETTINGS };
+  }
+}
+
+function saveVoiceSettings() {
+  localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify(currentVoiceSettings));
+}
+
+function getAvailableVoices() {
+  return window.speechSynthesis?.getVoices?.() || [];
+}
 
 function pickSweetChineseVoice() {
-  const voices = window.speechSynthesis?.getVoices?.() || [];
+  const voices = getAvailableVoices();
   if (!voices.length) return null;
+  if (currentVoiceSettings.voiceURI) {
+    const savedVoice = voices.find(voice => voice.voiceURI === currentVoiceSettings.voiceURI);
+    if (savedVoice) return savedVoice;
+  }
   const sweetVoicePatterns = [
-    /xiaoxiao/i,
-    /xiaoyi/i,
-    /xiaomo/i,
-    /xiaorui/i,
     /tingting/i,
     /meijia/i,
     /sinji/i,
     /mei-jia/i,
+    /xiaoxiao/i,
+    /xiaoyi/i,
+    /xiaomo/i,
+    /xiaorui/i,
     /google.*中文/i,
     /google.*普通话/i,
     /mandarin.*female/i,
@@ -417,9 +459,45 @@ function refreshSweetVoice() {
   preferredSweetVoice = pickSweetChineseVoice();
 }
 
+function syncVoiceControls() {
+  if (voiceRate) voiceRate.value = currentVoiceSettings.rate;
+  if (voicePitch) voicePitch.value = currentVoiceSettings.pitch;
+  if (voiceRateValue) voiceRateValue.textContent = Number(currentVoiceSettings.rate).toFixed(2);
+  if (voicePitchValue) voicePitchValue.textContent = Number(currentVoiceSettings.pitch).toFixed(2);
+}
+
+function populateVoiceSelect() {
+  if (!voiceSelect) return;
+  const voices = getAvailableVoices();
+  const previousValue = voiceSelect.value || currentVoiceSettings.voiceURI;
+  voiceSelect.innerHTML = '';
+
+  const autoOption = document.createElement('option');
+  autoOption.value = '';
+  autoOption.textContent = '自动选择中文声线';
+  voiceSelect.appendChild(autoOption);
+
+  voices.forEach(voice => {
+    const option = document.createElement('option');
+    option.value = voice.voiceURI;
+    option.textContent = `${voice.name} · ${voice.lang}${voice.default ? ' · 默认' : ''}`;
+    voiceSelect.appendChild(option);
+  });
+
+  voiceSelect.value = voices.some(voice => voice.voiceURI === previousValue) ? previousValue : '';
+}
+
+function refreshVoiceSettingsUI() {
+  populateVoiceSelect();
+  syncVoiceControls();
+  refreshSweetVoice();
+}
+
+loadVoiceSettings();
+
 if (window.speechSynthesis) {
   refreshSweetVoice();
-  window.speechSynthesis.addEventListener?.('voiceschanged', refreshSweetVoice);
+  window.speechSynthesis.addEventListener?.('voiceschanged', refreshVoiceSettingsUI);
 }
 
 function setVoiceUI(status, text) {
@@ -436,9 +514,9 @@ function speakByAvatar(text) {
     refreshSweetVoice();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
-    utterance.rate = 0.92;
-    utterance.pitch = 1.34;
-    utterance.volume = 0.92;
+    utterance.rate = Number(currentVoiceSettings.rate) || DEFAULT_VOICE_SETTINGS.rate;
+    utterance.pitch = Number(currentVoiceSettings.pitch) || DEFAULT_VOICE_SETTINGS.pitch;
+    utterance.volume = Number(currentVoiceSettings.volume) || DEFAULT_VOICE_SETTINGS.volume;
     if (preferredSweetVoice) utterance.voice = preferredSweetVoice;
     utterance.onend = () => {
       avatarSpeaking = false;
@@ -454,6 +532,55 @@ function speakByAvatar(text) {
     avatarSpeaking = false;
   }
 }
+
+voiceSettingsToggle?.addEventListener('click', event => {
+  event.stopPropagation();
+  if (!voiceSettings) return;
+  const willOpen = voiceSettings.hidden;
+  voiceSettings.hidden = !willOpen;
+  voiceSettingsToggle.classList.toggle('is-active', willOpen);
+  if (willOpen) refreshVoiceSettingsUI();
+});
+
+voiceSelect?.addEventListener('change', () => {
+  currentVoiceSettings.voiceURI = voiceSelect.value;
+  refreshSweetVoice();
+});
+
+voiceRate?.addEventListener('input', () => {
+  currentVoiceSettings.rate = Number(voiceRate.value);
+  syncVoiceControls();
+});
+
+voicePitch?.addEventListener('input', () => {
+  currentVoiceSettings.pitch = Number(voicePitch.value);
+  syncVoiceControls();
+});
+
+voiceTest?.addEventListener('click', () => {
+  speakByAvatar('你好呀，我是 Jack 的简历助手。这个声音如果舒服，就点保存。');
+});
+
+voiceSave?.addEventListener('click', () => {
+  saveVoiceSettings();
+  setVoiceUI('声音已保存', '以后这个浏览器会使用你选中的声线和参数。');
+});
+
+voiceReset?.addEventListener('click', () => {
+  currentVoiceSettings = { ...DEFAULT_VOICE_SETTINGS };
+  localStorage.removeItem(VOICE_SETTINGS_KEY);
+  refreshVoiceSettingsUI();
+  setVoiceUI('声音已重置', '已恢复自然声线参数，可以重新试听。');
+});
+
+document.addEventListener('click', event => {
+  if (!voiceSettings || voiceSettings.hidden) return;
+  if (voiceSettings.contains(event.target) || voiceSettingsToggle?.contains(event.target)) return;
+  voiceSettings.hidden = true;
+  voiceSettingsToggle?.classList.remove('is-active');
+});
+
+refreshVoiceSettingsUI();
 
 function answerResumeQuestion(rawText) {
   const text = rawText.toLowerCase();
