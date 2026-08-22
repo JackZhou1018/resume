@@ -37,8 +37,16 @@
 <header class="hero" id="hero">
   <div class="hologram">
     <div class="holo-ring"></div>
-    <div class="holo-avatar">周</div>
+    <button class="holo-avatar digital-human" id="digitalHuman" type="button" aria-label="唤醒 Jack Zhou 3D 数字人语音助手">
+      <canvas id="digitalHumanCanvas" aria-hidden="true"></canvas>
+      <span class="avatar-fallback">周</span>
+      <span class="voice-core" aria-hidden="true"></span>
+    </button>
     <div class="holo-scan"></div>
+    <div class="voice-bubble" id="voiceBubble" aria-live="polite">
+      <b id="voiceStatus">点击唤醒</b>
+      <span id="voiceTranscript">可问：项目、经历、AI Coding、联系方式</span>
+    </div>
   </div>
   <p class="hero-kicker">FAE Engineer · AI Compute · Beijing</p>
   <h1 class="hero-name" id="typeTarget"></h1>

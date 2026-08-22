@@ -379,6 +379,274 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && workReader && !workReader.hidden) closeManual();
 });
 
+/* ---------- 首页 3D 数字人语音交互 ---------- */
+const digitalHuman = document.getElementById('digitalHuman');
+const digitalHumanCanvas = document.getElementById('digitalHumanCanvas');
+const voiceStatus = document.getElementById('voiceStatus');
+const voiceTranscript = document.getElementById('voiceTranscript');
+let avatarSpeaking = false;
+let avatarListening = false;
+
+function setVoiceUI(status, text) {
+  if (voiceStatus) voiceStatus.textContent = status;
+  if (voiceTranscript) voiceTranscript.textContent = text;
+}
+
+function speakByAvatar(text) {
+  setVoiceUI('JACK AI 正在回复', text);
+  avatarSpeaking = true;
+  digitalHuman?.classList.add('is-listening');
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = 1.03;
+    utterance.pitch = 1.05;
+    const voices = window.speechSynthesis.getVoices();
+    const cnVoice = voices.find(v => /zh|Chinese|中文/i.test(v.lang + v.name));
+    if (cnVoice) utterance.voice = cnVoice;
+    utterance.onend = () => {
+      avatarSpeaking = false;
+      digitalHuman?.classList.remove('is-listening');
+      setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
+    };
+    utterance.onerror = () => {
+      avatarSpeaking = false;
+      digitalHuman?.classList.remove('is-listening');
+    };
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
+    avatarSpeaking = false;
+  }
+}
+
+function answerResumeQuestion(rawText) {
+  const text = rawText.toLowerCase();
+  if (/项目|作品|案例|战绩|project/.test(text)) {
+    location.hash = '#projects';
+    return '我已带你跳到项目区。这里重点展示 GPU 服务器交付、国产化适配、客户 POC 和 AI Coding 作品。';
+  }
+  if (/ai|coding|编程|代码|工具|自动化/.test(text)) {
+    location.hash = '#aicoding';
+    return '我已带你跳到 AI Coding 作品集。这里展示把 FAE 现场经验工具化的能力，包括巡检、故障取证、部署手册和三维可视化。';
+  }
+  if (/经历|经验|工作|公司|背景/.test(text)) {
+    location.hash = '#experience';
+    return 'Jack Zhou 有近十年服务器硬件与 AI 算力技术服务经验，覆盖联想、同方、摩尔线程，擅长客户 POC、交付和故障闭环。';
+  }
+  if (/联系|电话|微信|邮箱|contact/.test(text)) {
+    location.hash = '#contact';
+    return '我已带你跳到联系区。页面下方可以复制电话、邮箱和微信，微信号就是电话号码。';
+  }
+  if (/能力|技能|会什么|擅长/.test(text)) {
+    location.hash = '#skills';
+    return '核心能力包括 GPU 服务器 POC、集群交付、硬件测试、模型适配、RoCE 网络、BIOS、BMC 和故障闭环。';
+  }
+  return '你好，我是 Jack Zhou 的 3D 简历助手。你可以问我项目、经历、AI Coding、核心能力或者联系方式。';
+}
+
+function initVoiceAssistant() {
+  if (!digitalHuman) return;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'zh-CN';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      avatarListening = true;
+      digitalHuman.classList.add('is-listening');
+      setVoiceUI('正在听你说', '请说：项目 / 经历 / AI Coding / 联系方式');
+    };
+    recognition.onresult = event => {
+      let interim = '';
+      let finalText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const part = event.results[i][0]?.transcript || '';
+        if (event.results[i].isFinal) finalText += part;
+        else interim += part;
+      }
+      setVoiceUI('语音识别中', finalText || interim || '继续说，我在听');
+      if (finalText) speakByAvatar(answerResumeQuestion(finalText));
+    };
+    recognition.onerror = event => {
+      avatarListening = false;
+      digitalHuman.classList.remove('is-listening');
+      const tip = event.error === 'not-allowed' ? '浏览器没有麦克风权限，可允许后再点我。' : '语音识别中断，点我可以重试。';
+      setVoiceUI('语音未启动', tip);
+    };
+    recognition.onend = () => {
+      avatarListening = false;
+      if (!avatarSpeaking) {
+        digitalHuman.classList.remove('is-listening');
+        setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
+      }
+    };
+  }
+
+  digitalHuman.addEventListener('click', () => {
+    if (window.speechSynthesis?.speaking) {
+      window.speechSynthesis.cancel();
+      avatarSpeaking = false;
+      digitalHuman.classList.remove('is-listening');
+      setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
+      return;
+    }
+    if (!recognition) {
+      speakByAvatar('当前浏览器不支持语音识别，但我可以做语音介绍。你可以查看项目、经历、AI Coding 和联系方式。');
+      return;
+    }
+    try {
+      if (avatarListening) recognition.stop();
+      else recognition.start();
+    } catch (e) {
+      setVoiceUI('稍等一下', '语音模块正在重置，1 秒后再点我。');
+    }
+  });
+}
+
+function initDigitalHuman3D() {
+  if (!digitalHumanCanvas) return;
+  import('https://unpkg.com/three@0.160.1/build/three.module.js').then(THREE => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+    camera.position.set(0, 0.15, 5.4);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: digitalHumanCanvas,
+      alpha: true,
+      antialias: true
+    });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const avatar = new THREE.Group();
+    scene.add(avatar);
+
+    const cyanMat = new THREE.MeshPhysicalMaterial({
+      color: 0x8ff7ff,
+      emissive: 0x00d9ff,
+      emissiveIntensity: 1.45,
+      transparent: true,
+      opacity: 0.42,
+      roughness: 0.18,
+      metalness: 0.08,
+      transmission: 0.45,
+      thickness: 0.2
+    });
+    const whiteMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.82
+    });
+    const lineMat = new THREE.MeshBasicMaterial({
+      color: 0x00f3ff,
+      transparent: true,
+      opacity: 0.55,
+      wireframe: true
+    });
+
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.46, 1.18, 10, 22), cyanMat);
+    body.position.y = -0.42;
+    body.scale.set(0.82, 1, 0.44);
+    avatar.add(body);
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 32, 24), cyanMat);
+    head.position.y = 0.78;
+    head.scale.set(0.88, 1.05, 0.78);
+    avatar.add(head);
+
+    const torsoWire = new THREE.Mesh(new THREE.CapsuleGeometry(0.49, 1.2, 8, 14), lineMat);
+    torsoWire.position.copy(body.position);
+    torsoWire.scale.copy(body.scale).multiplyScalar(1.02);
+    avatar.add(torsoWire);
+
+    const core = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 16), whiteMat);
+    core.position.set(0, 0.02, 0.18);
+    avatar.add(core);
+
+    const halo1 = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.008, 8, 96), whiteMat);
+    halo1.rotation.x = Math.PI / 2.7;
+    halo1.position.y = 0.1;
+    avatar.add(halo1);
+
+    const halo2 = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.006, 8, 96), lineMat);
+    halo2.rotation.x = Math.PI / 2.15;
+    halo2.position.y = 0.62;
+    avatar.add(halo2);
+
+    const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.82, 8, 12), cyanMat);
+    leftArm.position.set(-0.55, -0.12, 0);
+    leftArm.rotation.z = -0.32;
+    avatar.add(leftArm);
+    const rightArm = leftArm.clone();
+    rightArm.position.x = 0.55;
+    rightArm.rotation.z = 0.32;
+    avatar.add(rightArm);
+
+    const particleGeo = new THREE.BufferGeometry();
+    const particleCount = 120;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const r = 0.45 + Math.random() * 0.76;
+      const a = Math.random() * Math.PI * 2;
+      positions[i * 3] = Math.cos(a) * r;
+      positions[i * 3 + 1] = -0.78 + Math.random() * 1.86;
+      positions[i * 3 + 2] = Math.sin(a) * r * 0.35;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
+      color: 0x9df8ff,
+      size: 0.025,
+      transparent: true,
+      opacity: 0.72
+    }));
+    avatar.add(particles);
+
+    scene.add(new THREE.AmbientLight(0x7cf6ff, 1.2));
+    const key = new THREE.PointLight(0x00f3ff, 4, 8);
+    key.position.set(1.7, 2.2, 3.2);
+    scene.add(key);
+    const rim = new THREE.PointLight(0xbc13fe, 2.5, 8);
+    rim.position.set(-2.5, 1.2, 2.2);
+    scene.add(rim);
+
+    function resizeAvatarRenderer() {
+      const rect = digitalHumanCanvas.getBoundingClientRect();
+      const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height)));
+      renderer.setSize(size, size, false);
+      camera.aspect = 1;
+      camera.updateProjectionMatrix();
+    }
+    resizeAvatarRenderer();
+    window.addEventListener('resize', resizeAvatarRenderer);
+
+    function animateAvatar(t) {
+      const time = t * 0.001;
+      const activeBoost = avatarSpeaking || avatarListening ? 1.55 : 1;
+      avatar.rotation.y = Math.sin(time * 0.7) * 0.22;
+      avatar.position.y = Math.sin(time * 1.5) * 0.04;
+      core.scale.setScalar((1.15 + Math.sin(time * 7) * 0.2) * activeBoost);
+      halo1.rotation.z = time * 0.75;
+      halo2.rotation.z = -time * 1.05;
+      particles.rotation.y = time * 0.28;
+      particles.rotation.z = Math.sin(time * 0.6) * 0.08;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animateAvatar);
+    }
+    requestAnimationFrame(animateAvatar);
+  }).catch(() => {
+    setVoiceUI('3D 加载失败', '网络拦截了 Three.js，语音助手仍可点击使用。');
+  });
+}
+
+initVoiceAssistant();
+initDigitalHuman3D();
+
 /* ---------- 联系按钮：复制 + 音效 ---------- */
 function beep() {
   try {
