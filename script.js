@@ -386,6 +386,41 @@ const voiceStatus = document.getElementById('voiceStatus');
 const voiceTranscript = document.getElementById('voiceTranscript');
 let avatarSpeaking = false;
 let avatarListening = false;
+let preferredSweetVoice = null;
+
+function pickSweetChineseVoice() {
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  if (!voices.length) return null;
+  const sweetVoicePatterns = [
+    /xiaoxiao/i,
+    /xiaoyi/i,
+    /xiaomo/i,
+    /xiaorui/i,
+    /tingting/i,
+    /meijia/i,
+    /sinji/i,
+    /mei-jia/i,
+    /google.*中文/i,
+    /google.*普通话/i,
+    /mandarin.*female/i,
+    /chinese.*female/i,
+    /zh.*female/i,
+    /女声|女生|女性|甜|晓晓|晓伊|婷婷|美佳/i
+  ];
+  const zhVoices = voices.filter(voice => /zh|cmn|chinese|mandarin|中文|普通话|國語/i.test(`${voice.lang} ${voice.name}`));
+  return sweetVoicePatterns
+    .map(pattern => zhVoices.find(voice => pattern.test(`${voice.name} ${voice.lang}`)))
+    .find(Boolean) || zhVoices[0] || voices.find(voice => /female|woman|samantha|karen|ting/i.test(voice.name)) || null;
+}
+
+function refreshSweetVoice() {
+  preferredSweetVoice = pickSweetChineseVoice();
+}
+
+if (window.speechSynthesis) {
+  refreshSweetVoice();
+  window.speechSynthesis.addEventListener?.('voiceschanged', refreshSweetVoice);
+}
 
 function setVoiceUI(status, text) {
   if (voiceStatus) voiceStatus.textContent = status;
@@ -393,18 +428,18 @@ function setVoiceUI(status, text) {
 }
 
 function speakByAvatar(text) {
-  setVoiceUI('JACK AI 正在回复', text);
+  setVoiceUI('甜妹模式回复中', text);
   avatarSpeaking = true;
   digitalHuman?.classList.add('is-listening');
   try {
     window.speechSynthesis.cancel();
+    refreshSweetVoice();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
-    utterance.rate = 1.03;
-    utterance.pitch = 1.05;
-    const voices = window.speechSynthesis.getVoices();
-    const cnVoice = voices.find(v => /zh|Chinese|中文/i.test(v.lang + v.name));
-    if (cnVoice) utterance.voice = cnVoice;
+    utterance.rate = 0.92;
+    utterance.pitch = 1.34;
+    utterance.volume = 0.92;
+    if (preferredSweetVoice) utterance.voice = preferredSweetVoice;
     utterance.onend = () => {
       avatarSpeaking = false;
       digitalHuman?.classList.remove('is-listening');
@@ -424,25 +459,25 @@ function answerResumeQuestion(rawText) {
   const text = rawText.toLowerCase();
   if (/项目|作品|案例|战绩|project/.test(text)) {
     location.hash = '#projects';
-    return '我已带你跳到项目区。这里重点展示 GPU 服务器交付、国产化适配、客户 POC 和 AI Coding 作品。';
+    return '好呀，我带你看项目。这里能看到 GPU 交付、国产化适配、客户 POC，还有 AI Coding 作品。';
   }
   if (/ai|coding|编程|代码|工具|自动化/.test(text)) {
     location.hash = '#aicoding';
-    return '我已带你跳到 AI Coding 作品集。这里展示把 FAE 现场经验工具化的能力，包括巡检、故障取证、部署手册和三维可视化。';
+    return '来啦，这里是 AI Coding 作品集。重点是把现场经验变成可复用的小工具和交付页面。';
   }
   if (/经历|经验|工作|公司|背景/.test(text)) {
     location.hash = '#experience';
-    return 'Jack Zhou 有近十年服务器硬件与 AI 算力技术服务经验，覆盖联想、同方、摩尔线程，擅长客户 POC、交付和故障闭环。';
+    return 'Jack 有近十年服务器和 AI 算力服务经验，做过联想、同方、摩尔线程相关项目，偏现场攻坚型。';
   }
   if (/联系|电话|微信|邮箱|contact/.test(text)) {
     location.hash = '#contact';
-    return '我已带你跳到联系区。页面下方可以复制电话、邮箱和微信，微信号就是电话号码。';
+    return '好的，联系区在这里。电话、邮箱、微信都可以复制，微信号就是手机号。';
   }
   if (/能力|技能|会什么|擅长/.test(text)) {
     location.hash = '#skills';
-    return '核心能力包括 GPU 服务器 POC、集群交付、硬件测试、模型适配、RoCE 网络、BIOS、BMC 和故障闭环。';
+    return '核心能力是 GPU POC、集群交付、硬件测试、模型适配、RoCE 网络和故障闭环。';
   }
-  return '你好，我是 Jack Zhou 的 3D 简历助手。你可以问我项目、经历、AI Coding、核心能力或者联系方式。';
+  return '你好呀，我是 Jack 的 3D 简历助手。你可以问我项目、经历、AI Coding、能力或者联系方式。';
 }
 
 function initVoiceAssistant() {
@@ -497,7 +532,7 @@ function initVoiceAssistant() {
       return;
     }
     if (!recognition) {
-      speakByAvatar('当前浏览器不支持语音识别，但我可以做语音介绍。你可以查看项目、经历、AI Coding 和联系方式。');
+      speakByAvatar('当前浏览器不支持语音识别，不过我可以先做语音介绍。你可以看看项目、经历、AI Coding 和联系方式。');
       return;
     }
     try {
