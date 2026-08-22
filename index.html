@@ -50,7 +50,22 @@
     <button class="voice-settings-toggle" id="voiceSettingsToggle" type="button" aria-label="打开数字人声音设置">声音设置</button>
     <div class="voice-settings" id="voiceSettings" hidden>
       <label>
-        <span>声线</span>
+        <span>OpenAI TTS 代理地址</span>
+        <input id="openaiTtsEndpoint" type="url" placeholder="https://你的-worker.workers.dev/tts">
+      </label>
+      <label>
+        <span>OpenAI 声线</span>
+        <select id="openaiVoiceSelect">
+          <option value="coral">coral · 清亮女声</option>
+          <option value="nova">nova · 年轻自然</option>
+          <option value="shimmer">shimmer · 柔和明亮</option>
+          <option value="marin">marin · 亲切自然</option>
+          <option value="verse">verse · 温和叙述</option>
+          <option value="alloy">alloy · 中性稳定</option>
+        </select>
+      </label>
+      <label>
+        <span>浏览器备用声线</span>
         <select id="voiceSelect"></select>
       </label>
       <label>

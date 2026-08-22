@@ -386,6 +386,8 @@ const voiceStatus = document.getElementById('voiceStatus');
 const voiceTranscript = document.getElementById('voiceTranscript');
 const voiceSettingsToggle = document.getElementById('voiceSettingsToggle');
 const voiceSettings = document.getElementById('voiceSettings');
+const openaiTtsEndpoint = document.getElementById('openaiTtsEndpoint');
+const openaiVoiceSelect = document.getElementById('openaiVoiceSelect');
 const voiceSelect = document.getElementById('voiceSelect');
 const voiceRate = document.getElementById('voiceRate');
 const voicePitch = document.getElementById('voicePitch');
@@ -399,6 +401,9 @@ let avatarListening = false;
 let preferredSweetVoice = null;
 const VOICE_SETTINGS_KEY = 'jackResumeVoiceSettings';
 const DEFAULT_VOICE_SETTINGS = {
+  provider: 'openai',
+  openaiEndpoint: '',
+  openaiVoice: 'coral',
   voiceURI: '',
   rate: 0.96,
   pitch: 1.0,
@@ -460,6 +465,8 @@ function refreshSweetVoice() {
 }
 
 function syncVoiceControls() {
+  if (openaiTtsEndpoint) openaiTtsEndpoint.value = currentVoiceSettings.openaiEndpoint || '';
+  if (openaiVoiceSelect) openaiVoiceSelect.value = currentVoiceSettings.openaiVoice || DEFAULT_VOICE_SETTINGS.openaiVoice;
   if (voiceRate) voiceRate.value = currentVoiceSettings.rate;
   if (voicePitch) voicePitch.value = currentVoiceSettings.pitch;
   if (voiceRateValue) voiceRateValue.textContent = Number(currentVoiceSettings.rate).toFixed(2);
@@ -505,8 +512,17 @@ function setVoiceUI(status, text) {
   if (voiceTranscript) voiceTranscript.textContent = text;
 }
 
-function speakByAvatar(text) {
-  setVoiceUI('甜妹模式回复中', text);
+let openaiAudioUrl = null;
+let openaiAudio = null;
+
+function finishAvatarSpeech() {
+  avatarSpeaking = false;
+  digitalHuman?.classList.remove('is-listening');
+  setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
+}
+
+function speakByBrowserTTS(text, status = '浏览器备用声线') {
+  setVoiceUI(status, text);
   avatarSpeaking = true;
   digitalHuman?.classList.add('is-listening');
   try {
@@ -518,19 +534,63 @@ function speakByAvatar(text) {
     utterance.pitch = Number(currentVoiceSettings.pitch) || DEFAULT_VOICE_SETTINGS.pitch;
     utterance.volume = Number(currentVoiceSettings.volume) || DEFAULT_VOICE_SETTINGS.volume;
     if (preferredSweetVoice) utterance.voice = preferredSweetVoice;
-    utterance.onend = () => {
-      avatarSpeaking = false;
-      digitalHuman?.classList.remove('is-listening');
-      setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
-    };
+    utterance.onend = finishAvatarSpeech;
     utterance.onerror = () => {
-      avatarSpeaking = false;
-      digitalHuman?.classList.remove('is-listening');
+      finishAvatarSpeech();
     };
     window.speechSynthesis.speak(utterance);
   } catch (e) {
-    avatarSpeaking = false;
+    finishAvatarSpeech();
   }
+}
+
+async function speakByOpenAITTS(text) {
+  const endpoint = (currentVoiceSettings.openaiEndpoint || '').trim();
+  if (!endpoint) return false;
+
+  setVoiceUI('OpenAI 真人声生成中', text);
+  avatarSpeaking = true;
+  digitalHuman?.classList.add('is-listening');
+
+  if (openaiAudio) {
+    openaiAudio.pause();
+    openaiAudio = null;
+  }
+  if (openaiAudioUrl) {
+    URL.revokeObjectURL(openaiAudioUrl);
+    openaiAudioUrl = null;
+  }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text,
+      voice: currentVoiceSettings.openaiVoice || DEFAULT_VOICE_SETTINGS.openaiVoice,
+      instructions: '用年轻、亲切、自然的中文女声说话，声音干净甜美但不要夹，不要播音腔，语气像简历网站里的 AI 助手，轻快、有礼貌、不要夸张。'
+    })
+  });
+  if (!response.ok) throw new Error(`OpenAI TTS proxy failed: ${response.status}`);
+
+  const audioBlob = await response.blob();
+  if (!audioBlob.type.startsWith('audio/')) throw new Error('OpenAI TTS proxy did not return audio');
+
+  openaiAudioUrl = URL.createObjectURL(audioBlob);
+  openaiAudio = new Audio(openaiAudioUrl);
+  openaiAudio.onended = finishAvatarSpeech;
+  openaiAudio.onerror = finishAvatarSpeech;
+  setVoiceUI('OpenAI 真人声播放中', text);
+  await openaiAudio.play();
+  return true;
+}
+
+async function speakByAvatar(text) {
+  try {
+    if (await speakByOpenAITTS(text)) return;
+  } catch (e) {
+    setVoiceUI('OpenAI TTS 不可用', '已自动切回浏览器备用声线。请检查代理地址或后端 API Key。');
+  }
+  speakByBrowserTTS(text);
 }
 
 voiceSettingsToggle?.addEventListener('click', event => {
@@ -540,6 +600,14 @@ voiceSettingsToggle?.addEventListener('click', event => {
   voiceSettings.hidden = !willOpen;
   voiceSettingsToggle.classList.toggle('is-active', willOpen);
   if (willOpen) refreshVoiceSettingsUI();
+});
+
+openaiTtsEndpoint?.addEventListener('input', () => {
+  currentVoiceSettings.openaiEndpoint = openaiTtsEndpoint.value.trim();
+});
+
+openaiVoiceSelect?.addEventListener('change', () => {
+  currentVoiceSettings.openaiVoice = openaiVoiceSelect.value;
 });
 
 voiceSelect?.addEventListener('change', () => {
@@ -562,8 +630,10 @@ voiceTest?.addEventListener('click', () => {
 });
 
 voiceSave?.addEventListener('click', () => {
+  currentVoiceSettings.openaiEndpoint = openaiTtsEndpoint?.value.trim() || '';
+  currentVoiceSettings.openaiVoice = openaiVoiceSelect?.value || DEFAULT_VOICE_SETTINGS.openaiVoice;
   saveVoiceSettings();
-  setVoiceUI('声音已保存', '以后这个浏览器会使用你选中的声线和参数。');
+  setVoiceUI('声音已保存', currentVoiceSettings.openaiEndpoint ? '已优先使用 OpenAI 真人声；失败时自动切回浏览器声线。' : '未配置 OpenAI 代理，将继续使用浏览器备用声线。');
 });
 
 voiceReset?.addEventListener('click', () => {

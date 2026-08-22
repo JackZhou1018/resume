@@ -52,3 +52,10 @@
 - 面板可选择当前浏览器可用 TTS 声线，调节语速和音调，并支持试听、保存、重置。
 - 保存结果写入访问者本机浏览器 `localStorage`，不影响其他访问者。
 - 默认语音参数回退为更自然的 `rate=0.96`、`pitch=1.0`，避免高音调造成尖锐感。
+
+## 2026-08-23 OpenAI TTS 真人声接入
+
+- 首页声音设置面板新增「OpenAI TTS 代理地址」和「OpenAI 声线」。
+- 前端优先请求后端代理播放 OpenAI TTS 音频，失败或未配置时自动回退浏览器 TTS。
+- 新增 `server/openai-tts-worker.js` Cloudflare Worker 代理模板，API Key 只从后端环境变量 `OPENAI_API_KEY` 读取，不进入 GitHub Pages 前端。
+- 新增 `docs/openai-tts-worker部署说明.md`，记录部署与配置方法。

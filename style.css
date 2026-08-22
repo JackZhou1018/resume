@@ -333,16 +333,21 @@ body {
   color: rgba(255,255,255,.78);
 }
 .voice-settings select,
+.voice-settings input[type="url"],
 .voice-settings input[type="range"] {
   width: 100%;
 }
-.voice-settings select {
+.voice-settings select,
+.voice-settings input[type="url"] {
   min-height: 34px;
   border: 1px solid rgba(0,243,255,.28);
   border-radius: 10px;
   background: rgba(0,0,0,.42);
   color: #fff;
   padding: 6px 9px;
+}
+.voice-settings input[type="url"]::placeholder {
+  color: rgba(255,255,255,.36);
 }
 .voice-settings-actions {
   display: grid;
