@@ -286,6 +286,7 @@ const manualTitles = {
   market: '每日盯盘 · 3D Market Deck',
   starship: '星舰 V3 · 工程级 3D 交付',
   moore: '摩尔线程产品介绍 · 互动演示',
+  jarvis: 'JARVIS 全息人形 · 3D Preview',
   deepseek: 'DeepSeek V4 Flash PD 分离部署手册',
   glm: 'GLM5.2 PD 部署操作手册'
 };

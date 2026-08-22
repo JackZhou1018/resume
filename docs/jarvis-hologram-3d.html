@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS 全息人形 · 3D Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: "SF Mono", Menlo, Consolas, "PingFang SC", monospace;
+    color: #dff8ff;
+    background:
+      radial-gradient(circle at 50% 38%, rgba(120, 210, 255, .32), transparent 28%),
+      radial-gradient(circle at 50% 100%, rgba(30, 130, 255, .24), transparent 38%),
+      linear-gradient(180deg, #f7fbff 0%, #dce7f0 42%, #050914 100%);
+  }
+  #stage { position: fixed; inset: 0; }
+  .hud {
+    position: fixed;
+    left: 22px;
+    top: 20px;
+    z-index: 3;
+    width: min(360px, calc(100vw - 44px));
+    padding: 16px 18px;
+    border: 1px solid rgba(120, 230, 255, .32);
+    background: linear-gradient(135deg, rgba(1, 10, 24, .42), rgba(20, 90, 140, .16));
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 34px rgba(0, 190, 255, .16);
+  }
+  .hud p:first-child {
+    color: #81e8ff;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .hud h1 {
+    margin-top: 8px;
+    color: #fff;
+    font-size: clamp(21px, 4vw, 34px);
+    line-height: 1.05;
+    text-shadow: 0 0 20px rgba(0, 180, 255, .62);
+  }
+  .hud p:last-child {
+    margin-top: 10px;
+    color: rgba(225, 248, 255, .74);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .status {
+    position: fixed;
+    right: 22px;
+    bottom: 20px;
+    z-index: 3;
+    display: grid;
+    gap: 8px;
+    color: rgba(220, 250, 255, .8);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-align: right;
+    text-shadow: 0 0 12px rgba(0, 180, 255, .7);
+  }
+  .status span::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: #7ff1ff;
+    box-shadow: 0 0 12px #7ff1ff;
+  }
+  .scanline {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,.035) 0 1px, transparent 1px 5px);
+    mix-blend-mode: screen;
+    opacity: .38;
+  }
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 45%, transparent 0 44%, rgba(0,0,0,.46) 100%);
+  }
+  @media (max-width: 760px) {
+    .hud { left: 12px; top: 12px; padding: 13px 14px; }
+    .status { right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="scanline"></div>
+<div class="vignette"></div>
+<section class="hud">
+  <p>AI HOLOGRAM // THREE.JS MODEL</p>
+  <h1>JARVIS 全息人形</h1>
+  <p>透明淡蓝白光体、胸口核心、环形数据轨道、粒子流与数据雨。拖动可旋转，滚轮可缩放。</p>
+</section>
+<div class="status">
+  <span>TRANSLUCENT BODY</span>
+  <span>PARTICLE DATA FLOW</span>
+  <span>ORBITAL RINGS ONLINE</span>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const container = document.getElementById('stage');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0xd8f3ff, 0.035);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 1.45, 7.6);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.92;
+container.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 0.9, 0);
+controls.minDistance = 4.2;
+controls.maxDistance = 11;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.36;
+
+scene.add(new THREE.HemisphereLight(0xe9fbff, 0x0b1a2d, 1.05));
+const key = new THREE.DirectionalLight(0xffffff, 2.6);
+key.position.set(2.4, 4.8, 5);
+scene.add(key);
+const rim = new THREE.PointLight(0x36c9ff, 6.5, 9);
+rim.position.set(-2.6, 2.4, 2.2);
+scene.add(rim);
+const coreLight = new THREE.PointLight(0x9eefff, 5.5, 6);
+coreLight.position.set(0, 1.45, 1);
+scene.add(coreLight);
+
+const body = new THREE.Group();
+body.position.y = -0.15;
+scene.add(body);
+
+const shellMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0x58cfff,
+  emissive: 0x0a6cff,
+  emissiveIntensity: 0.08,
+  roughness: 0.18,
+  metalness: 0,
+  transparent: true,
+  opacity: 0.105,
+  transmission: 0.78,
+  thickness: 0.9,
+  depthWrite: false,
+  side: THREE.DoubleSide
+});
+
+const wireMaterial = new THREE.MeshBasicMaterial({
+  color: 0xdffbff,
+  transparent: true,
+  opacity: 0.105,
+  wireframe: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const glowMaterial = new THREE.MeshBasicMaterial({
+  color: 0xefffff,
+  transparent: true,
+  opacity: 0.72,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+function addPart(name, geometry, position, scale, rotation = [0, 0, 0]) {
+  const mesh = new THREE.Mesh(geometry, shellMaterial);
+  mesh.name = name;
+  mesh.position.set(...position);
+  mesh.scale.set(...scale);
+  mesh.rotation.set(...rotation);
+  body.add(mesh);
+  const wire = new THREE.Mesh(geometry.clone(), wireMaterial);
+  wire.position.copy(mesh.position);
+  wire.scale.copy(mesh.scale).multiplyScalar(1.012);
+  wire.rotation.copy(mesh.rotation);
+  body.add(wire);
+  return mesh;
+}
+
+const sphere = new THREE.SphereGeometry(1, 64, 32);
+const torsoGeo = new THREE.SphereGeometry(1, 64, 32);
+const abdomenGeo = new THREE.CapsuleGeometry(0.34, 0.8, 16, 28);
+const limbGeo = new THREE.CapsuleGeometry(0.18, 1.25, 12, 24);
+const forearmGeo = new THREE.CapsuleGeometry(0.15, 1.05, 12, 24);
+const legGeo = new THREE.CapsuleGeometry(0.2, 1.45, 14, 28);
+const handGeo = new THREE.SphereGeometry(0.18, 24, 16);
+
+addPart('head', sphere, [0, 2.74, 0], [0.43, 0.52, 0.43]);
+addPart('neck', new THREE.CapsuleGeometry(0.14, 0.38, 10, 16), [0, 2.21, 0], [1, 1, 1]);
+addPart('torso', torsoGeo, [0, 1.58, 0], [0.82, 0.9, 0.42]);
+addPart('abdomen', abdomenGeo, [0, 0.78, 0], [0.9, 1.0, 0.72]);
+addPart('pelvis', sphere, [0, 0.16, 0], [0.48, 0.3, 0.38]);
+
+addPart('leftUpperArm', limbGeo, [-0.86, 1.62, 0], [1, 1, 1], [0, 0, -0.82]);
+addPart('rightUpperArm', limbGeo, [0.86, 1.62, 0], [1, 1, 1], [0, 0, 0.82]);
+addPart('leftForearm', forearmGeo, [-1.38, 0.86, 0.03], [0.95, 1, 0.95], [0, 0, -0.42]);
+addPart('rightForearm', forearmGeo, [1.38, 0.86, 0.03], [0.95, 1, 0.95], [0, 0, 0.42]);
+addPart('leftHand', handGeo, [-1.67, 0.22, 0.08], [1.05, 0.55, 0.28], [0, 0, 0.28]);
+addPart('rightHand', handGeo, [1.67, 0.22, 0.08], [1.05, 0.55, 0.28], [0, 0, -0.28]);
+
+addPart('leftThigh', legGeo, [-0.24, -0.62, 0], [0.92, 1, 0.82], [0, 0, -0.06]);
+addPart('rightThigh', legGeo, [0.24, -0.62, 0], [0.92, 1, 0.82], [0, 0, 0.06]);
+addPart('leftCalf', legGeo, [-0.16, -1.75, 0.02], [0.86, 0.92, 0.82], [0, 0, 0.09]);
+addPart('rightCalf', legGeo, [0.16, -1.75, 0.02], [0.86, 0.92, 0.82], [0, 0, -0.09]);
+addPart('leftFoot', handGeo, [-0.17, -2.55, 0.12], [0.62, 0.2, 0.84], [0.22, 0, 0]);
+addPart('rightFoot', handGeo, [0.17, -2.52, 0.12], [0.62, 0.2, 0.84], [0.22, 0, 0]);
+
+const core = new THREE.Group();
+core.position.set(0, 1.62, 0.43);
+body.add(core);
+core.add(new THREE.Mesh(new THREE.SphereGeometry(0.16, 48, 24), glowMaterial));
+for (let i = 0; i < 3; i++) {
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(0.22 + i * 0.08, 0.008, 12, 96), glowMaterial);
+  torus.rotation.x = Math.PI / 2;
+  torus.material = glowMaterial.clone();
+  torus.material.opacity = 0.62 - i * 0.12;
+  core.add(torus);
+}
+
+function makeRing(y, radiusX, radiusZ, tilt, color = 0x8eeeff) {
+  const curve = new THREE.EllipseCurve(0, 0, radiusX, radiusZ, 0, Math.PI * 2);
+  const points = curve.getPoints(240).map(p => new THREE.Vector3(p.x, 0, p.y));
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.62, blending: THREE.AdditiveBlending });
+  const line = new THREE.LineLoop(geo, mat);
+  line.position.y = y;
+  line.rotation.x = Math.PI / 2 + tilt;
+  return line;
+}
+
+const rings = new THREE.Group();
+scene.add(rings);
+[
+  [2.72, 1.05, 0.28, 0.04],
+  [1.72, 1.6, 0.42, -0.08],
+  [0.55, 1.42, 0.36, 0.1],
+  [-0.92, 1.28, 0.32, -0.05],
+  [-2.55, 0.9, 0.24, 0.02]
+].forEach((r, index) => {
+  const ring = makeRing(...r);
+  ring.userData.spin = (index % 2 ? -1 : 1) * (0.0025 + index * 0.0006);
+  rings.add(ring);
+});
+
+const dataSegments = new THREE.Group();
+scene.add(dataSegments);
+for (let i = 0; i < 72; i++) {
+  const h = 0.08 + Math.random() * 0.38;
+  const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -h, 0), new THREE.Vector3(0, h, 0)]);
+  const mat = new THREE.LineBasicMaterial({ color: 0x68d9ff, transparent: true, opacity: 0.2 + Math.random() * 0.45, blending: THREE.AdditiveBlending });
+  const line = new THREE.Line(geo, mat);
+  const angle = Math.random() * Math.PI * 2;
+  const radius = 1.0 + Math.random() * 1.25;
+  line.position.set(Math.cos(angle) * radius, -2.4 + Math.random() * 5.5, Math.sin(angle) * radius * 0.35 - 0.25);
+  line.userData.speed = 0.006 + Math.random() * 0.015;
+  dataSegments.add(line);
+}
+
+function makeParticles(count, radius, height) {
+  const positions = [];
+  const colors = [];
+  const colorA = new THREE.Color(0xdffcff);
+  const colorB = new THREE.Color(0x2aaaff);
+  for (let i = 0; i < count; i++) {
+    const y = -height / 2 + Math.random() * height;
+    const bodyRadius = radius * (0.45 + 0.55 * Math.sin((y / height + 0.5) * Math.PI));
+    const a = Math.random() * Math.PI * 2;
+    const r = bodyRadius * Math.sqrt(Math.random());
+    positions.push(Math.cos(a) * r, y + 0.24, Math.sin(a) * r * 0.42);
+    const c = colorA.clone().lerp(colorB, Math.random());
+    colors.push(c.r, c.g, c.b);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const mat = new THREE.PointsMaterial({
+    size: 0.028,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.82,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  return new THREE.Points(geo, mat);
+}
+const particles = makeParticles(1450, 1.22, 5.5);
+scene.add(particles);
+
+const circuitLines = new THREE.Group();
+body.add(circuitLines);
+for (let i = 0; i < 90; i++) {
+  const y = -2.1 + Math.random() * 4.8;
+  const width = 0.08 + Math.random() * 0.24;
+  const x = (Math.random() - 0.5) * (y > 0.6 ? 1.0 : 0.55);
+  const z = 0.42 + Math.random() * 0.03;
+  const geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(x, y, z),
+    new THREE.Vector3(x + (Math.random() > 0.5 ? width : -width), y + Math.random() * 0.08, z)
+  ]);
+  const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xe9ffff, transparent: true, opacity: 0.25 + Math.random() * 0.35, blending: THREE.AdditiveBlending }));
+  circuitLines.add(line);
+}
+
+const base = new THREE.Group();
+scene.add(base);
+for (let i = 0; i < 4; i++) {
+  const torus = new THREE.Mesh(
+    new THREE.TorusGeometry(0.65 + i * 0.2, 0.006, 10, 160),
+    new THREE.MeshBasicMaterial({ color: 0x8be9ff, transparent: true, opacity: 0.2 - i * 0.03, blending: THREE.AdditiveBlending })
+  );
+  torus.position.y = -2.95;
+  torus.rotation.x = Math.PI / 2;
+  base.add(torus);
+}
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.26, 0.48, 0.42);
+composer.addPass(bloom);
+
+const clock = new THREE.Clock();
+function animate() {
+  const t = clock.getElapsedTime();
+  body.position.y = -0.15 + Math.sin(t * 1.2) * 0.06;
+  body.rotation.y = Math.sin(t * 0.28) * 0.12;
+  core.scale.setScalar(1 + Math.sin(t * 4.2) * 0.08);
+  coreLight.intensity = 4.6 + Math.sin(t * 4.2) * 1.6;
+  rings.children.forEach((ring, i) => {
+    ring.rotation.z += ring.userData.spin;
+    ring.position.y += Math.sin(t * 1.1 + i) * 0.0008;
+  });
+  dataSegments.children.forEach(line => {
+    line.position.y -= line.userData.speed;
+    if (line.position.y < -2.75) line.position.y = 3.05;
+  });
+  particles.rotation.y += 0.0015;
+  particles.material.opacity = 0.68 + Math.sin(t * 2.6) * 0.14;
+  circuitLines.children.forEach((line, i) => {
+    line.material.opacity = 0.18 + Math.abs(Math.sin(t * 2.2 + i * 0.31)) * 0.35;
+  });
+  controls.update();
+  composer.render();
+  requestAnimationFrame(animate);
+}
+animate();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+  bloom.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
