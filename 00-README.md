@@ -4,7 +4,14 @@
 
 - 线上地址：https://jackzhou1018.github.io/resume/
 - 类型：纯静态 GitHub Pages 简历网站
-- 当前阶段：AI Coding 作品集交互优化
+- 当前阶段：首页体验与简历入口优化
+
+## 2026-08-28 首页体验优化
+
+- 将首页可见的「声音设置」文字按钮改为低干扰齿轮入口，保留 TTS 手动调节能力，暂不改声线参数。
+- 新增移动端汉堡导航，解决小屏幕下导航链接被隐藏且无入口的问题。
+- 新增「下载 PDF 简历」首页 CTA，并将真实简历复制到 `outputs/jack-zhou-resume.pdf` 作为站内资源。
+- 背景视频增加 `preload="metadata"` 和静态深色 fallback；本机暂未检测到 `ffmpeg`，未直接压缩 `bg.mp4`。
 
 ## 2026-08-22 更新
 

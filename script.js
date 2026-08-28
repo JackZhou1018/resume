@@ -905,7 +905,41 @@ document.querySelectorAll('.contact-btn[data-copy]').forEach(btn => {
 
 /* ---------- 导航栏滚动模糊 ---------- */
 const nav = document.getElementById('nav');
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
 addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40));
+
+function setMobileNav(open) {
+  navToggle?.classList.toggle('is-open', open);
+  navLinks?.classList.toggle('is-open', open);
+  navToggle?.setAttribute('aria-expanded', String(open));
+  navToggle?.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+}
+
+navToggle?.addEventListener('click', event => {
+  event.stopPropagation();
+  setMobileNav(!navLinks?.classList.contains('is-open'));
+});
+
+navLinks?.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => setMobileNav(false));
+});
+
+document.addEventListener('click', event => {
+  if (!navLinks?.classList.contains('is-open')) return;
+  if (nav?.contains(event.target)) return;
+  setMobileNav(false);
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setMobileNav(false);
+});
+
+/* ---------- 背景视频加载兜底 ---------- */
+const bgVideo = document.getElementById('bgVideo');
+bgVideo?.addEventListener('error', () => {
+  bgVideo.classList.add('is-unavailable');
+});
 
 /* ---------- 故障转场兜底移除 ---------- */
 setTimeout(() => {
