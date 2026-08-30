@@ -38,6 +38,12 @@
 - 国内公网地址：https://jack-zhou-resume-cn-eiw6qp1b.edgeone.cool/
 - 已验证公网首页包含 AI Compute Core，PDF 路径返回 HTTP 200；GitHub Pages 地址继续保留作为备用入口。
 
+## 2026-08-30 公网加载体验验收
+
+- EdgeOne 公网桌面视口加载完成，Hero、AI Compute Core 和 PDF 入口均存在，控制台无 error/warning。
+- 390×844 手机视口验证：`clientWidth=375`、`scrollWidth=375`，无横向溢出；Hero 与 3D 核心正常渲染。
+- 静态资源体量保持克制（HTML/CSS/JS/头像/PDF 已上传）；背景视频为独立远程资源，不阻塞 HTML 首屏。后续如需进一步压缩首屏，可再做视频延迟加载或移动端静态背景策略。
+
 ## 2026-08-30 入场动画后导航居中修复
 
 - 修复用户反馈“导航页跑偏”：原因是入场后的通用组装动画 `labAssemble` 使用 `transform: translateY(...)`，覆盖了固定导航栏原本依赖的 `transform: translateX(-50%)` 居中定位。
