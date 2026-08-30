@@ -1,275 +1,735 @@
 /* ============================================================
-   硬核科技风个人主页 · 脚本
-   背景：逼真黑洞（引力透镜 + 光子环 + 吸积盘）+ 3D 星空 + 星系
-   交互：打字机 / 环形进度 / 3D倾斜 / 复制反馈 / 导航模糊 / 故障转场
+   Jack Zhou Resume Lab
+   交互：低干扰背景粒子 / 作品 Portal / 模块筛选 / Workbench 标签 /
+   复制反馈 / 移动端导航 / 背景视频兜底
    ============================================================ */
 
 const canvas = document.getElementById('bgCanvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas?.getContext('2d');
+let W = 0;
+let H = 0;
 const PI2 = Math.PI * 2;
-let W, H;
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-resize();
-addEventListener('resize', resize);
 
-/* ============================================================
-   逼真黑洞（《星际穿越》卡冈图雅风格）
-   视觉层次：体积光晕 → 吸积盘（倾斜+多普勒亮度差）→ 事件视界
-   → 光子环 → 引力透镜上下光弧
-   ============================================================ */
-function drawBlackHole(t) {
-  const cx = W / 2, cy = H / 2;
-  const R = Math.min(W, H) * 0.19;          // 事件视界半径
-  const tilt = -0.16;                        // 吸积盘倾斜角
-  const pulse = 0.9 + 0.1 * Math.sin(t * 0.0012);
-
-  // 1) 体积光晕：暖橙，从内核向外衰减（模拟吸积盘辐射的光）
-  let bloom = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 3.4);
-  bloom.addColorStop(0.00, `rgba(255,190,110,${0.6 * pulse})`);
-  bloom.addColorStop(0.25, `rgba(255,130,60,${0.28 * pulse})`);
-  bloom.addColorStop(0.55, `rgba(140,50,20,${0.10 * pulse})`);
-  bloom.addColorStop(1.00, 'rgba(0,0,0,0)');
-  ctx.fillStyle = bloom;
-  ctx.beginPath(); ctx.arc(cx, cy, R * 3.4, 0, PI2); ctx.fill();
-
-  // 2) 吸积盘：倾斜椭圆环，左右亮度不对称（多普勒束效应，接近侧更亮）
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(tilt);
-  const rx = R * 2.05, ry = R * 0.74;
-  let disk = ctx.createLinearGradient(-rx, 0, rx, 0);
-  disk.addColorStop(0.00, 'rgba(255,235,190,0.95)');  // 左：接近侧，白热
-  disk.addColorStop(0.35, 'rgba(255,175,90,0.80)');
-  disk.addColorStop(0.65, 'rgba(200,90,40,0.55)');
-  disk.addColorStop(1.00, 'rgba(120,45,20,0.30)');     // 右：远离侧，暗红
-  ctx.strokeStyle = disk;
-  ctx.lineWidth = R * 0.55;
-  ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, PI2); ctx.stroke();
-
-  // 3) 盘内缘：一圈白热细环（高温气体）
-  ctx.strokeStyle = 'rgba(255,250,235,0.95)';
-  ctx.lineWidth = R * 0.10;
-  ctx.beginPath(); ctx.ellipse(0, 0, rx * 0.70, ry * 0.70, 0, 0, PI2); ctx.stroke();
-  ctx.restore();
-
-  // 4) 事件视界：纯黑球体
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, PI2);
-  ctx.fillStyle = '#000';
-  ctx.fill();
-
-  // 5) 光子环：事件视界外一圈极细极亮的光（引力透镜标志）
-  ctx.strokeStyle = `rgba(255,255,255,${0.95 * pulse})`;
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(cx, cy, R * 1.05, 0, PI2); ctx.stroke();
-
-  // 6) 引力透镜光弧：盘背面的光被弯曲，在黑洞上下形成两道竖弧
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.strokeStyle = `rgba(255,225,170,${0.85 * pulse})`;
-  ctx.lineWidth = 2.5;
-  const arx = R * 1.34, ary = R * 0.62;
-  // 上弧：椭圆顶部一段
-  ctx.beginPath();
-  ctx.ellipse(0, 0, arx, ary, 0, Math.PI, PI2);
-  ctx.stroke();
-  // 下弧：椭圆底部一段
-  ctx.beginPath();
-  ctx.ellipse(0, 0, arx, ary, 0, 0, Math.PI);
-  ctx.stroke();
-  ctx.restore();
-}
-
-/* ============================================================
-   真实感恒星：预渲染发光星斑（柔光晕 + 十字衍射星芒）
-   ============================================================ */
-// 生成一颗带光晕（可选十字星芒）的恒星精灵
-function makeStarSprite(color, spike = false) {
-  const S = 64;
-  const c = document.createElement('canvas');
-  c.width = c.height = S;
-  const g = c.getContext('2d');
-  const r = S / 2;
-
-  // 柔光晕
-  let halo = g.createRadialGradient(r, r, 0, r, r, r);
-  halo.addColorStop(0.0, 'rgba(255,255,255,1)');
-  halo.addColorStop(0.22, color);
-  halo.addColorStop(0.6, hexToRgba(color, 0.25));
-  halo.addColorStop(1.0, 'rgba(0,0,0,0)');
-  g.fillStyle = halo;
-  g.fillRect(0, 0, S, S);
-
-  // 十字衍射星芒（亮星特有）
-  if (spike) {
-    g.strokeStyle = 'rgba(255,255,255,0.55)';
-    g.lineWidth = 1.2;
-    const L = r * 0.9;
-    g.beginPath(); g.moveTo(r - L, r); g.lineTo(r + L, r); g.stroke();      // 横
-    g.beginPath(); g.moveTo(r, r - L); g.lineTo(r, r + L); g.stroke();      // 竖
+/* ---------- 参考站等价功能：主题 / 配色 / 鼠标特效 ---------- */
+const paletteToggle = document.getElementById('paletteToggle');
+const themePicker = document.getElementById('themePicker');
+const paletteMenu = document.getElementById('paletteMenu');
+const paletteOptions = document.querySelectorAll('[data-accent-option]');
+const themeToggle = document.getElementById('themeToggle');
+const cursorAura = document.getElementById('cursorAura');
+const cursorDot = document.getElementById('cursorDot');
+const languageToggle = document.getElementById('languageToggle');
+const labShell = document.querySelector('.lab-shell');
+const THEME_KEY = 'jackResumeLabTheme';
+const ACCENT_KEY = 'jackResumeLabAccent';
+const LANG_KEY = 'jackResumeLabLang';
+const accents = ['golden', 'cyan', 'purple', 'emerald', 'rose'];
+const zhPageTitle = document.title;
+const metaDescription = document.querySelector('meta[name="description"]');
+const zhMetaDescription = metaDescription?.getAttribute('content') || '';
+const translations = {
+  en: {
+    '周猛 Jack Zhou · FAE 工程师 · AI 算力技术支持': 'Jack Zhou · FAE Engineer · AI Compute Technical Support',
+    '首页': 'Home',
+    '能力': 'Systems',
+    '实验台': 'Workbench',
+    '项目': 'Projects',
+    '经历': 'Logs',
+    '联系': 'Contact',
+    'AI Compute FAE / Beijing': 'AI Compute FAE / Beijing',
+    'PERSONAL DIGITAL LAB': 'PERSONAL DIGITAL LAB',
+    'Jack Zhou': 'Jack Zhou',
+    '近 10 年服务器硬件与 AI 算力技术服务经验，覆盖联想、同方、摩尔线程。长期负责大客户 POC、OEM 适配、GPU 服务器交付、RoCE 组网、故障闭环与跨部门项目推进。': 'Nearly 10 years of server hardware and AI compute technical service experience across Lenovo, Tongfang, and Moore Threads. Focused on key-account POC, OEM adaptation, GPU server delivery, RoCE networking, issue closure, and cross-functional project execution.',
+    'GPU 服务器 POC': 'GPU Server POC',
+    '大模型训推适配': 'LLM Training / Inference Adaptation',
+    '国产化集群交付': 'Domestic Compute Cluster Delivery',
+    '进入 Workbench →': 'Enter Workbench →',
+    '下载 PDF 简历 ↓': 'Download PDF Resume ↓',
+    '联系我': 'Contact Me',
+    '男 · 32 · 北京 · 社招': 'Male · 32 · Beijing · Experienced Hire',
+    'AI 算力现场攻坚 / FAE 交付': 'AI Compute Field Troubleshooting / FAE Delivery',
+    '把客户需求翻译成测试项、交付流程、上线标准和可复用 SOP。': 'Translate customer requirements into test items, delivery processes, launch criteria, and reusable SOPs.',
+    'AI 服务器交付': 'AI Servers Delivered',
+    '头部客户 POC': 'Key-Account POCs',
+    'GPU 图形卡订单': 'GPU Graphics Card Orders',
+    '展会 Demo 支持': 'Demo Events Supported',
+    '现场攻坚型 FAE': 'Field-Ready FAE for AI Compute',
+    '定位': 'Positioning',
+    '以原始 PDF 简历为内容源：聚焦 GPU 服务器 / 加速卡 POC 验证、主流大模型适配、集群部署与故障闭环，覆盖从客户需求对接、方案设计、POC 验证到订单落地和量产交付的完整技术链路。': 'Based on the original PDF resume: focused on GPU server / accelerator POC validation, mainstream LLM adaptation, cluster deployment, and issue closure across the full technical chain from customer requirement alignment and solution design to POC validation, order conversion, and mass delivery.',
+    '北京': 'Beijing',
+    'FAE 工程师': 'FAE Engineer',
+    '35-45K · 社招': '35-45K · Experienced Hire',
+    'AI 算力全栈技术闭环': 'Full-Cycle AI Compute Delivery',
+    '精通 GPU 服务器 / 加速卡 POC 验证、主流大模型适配、集群部署与故障闭环，覆盖从选型到量产的完整技术链路。': 'Strong in GPU server / accelerator POC validation, mainstream LLM adaptation, cluster deployment, and issue closure from selection to mass delivery.',
+    '多行业头部客户实战沉淀': 'Key-Account Experience Across Industries',
+    '主导互联网、央国企、金融、工业机器人等多场景标杆项目，具备国产化信创与 AI 平台落地经验。': 'Led benchmark projects across internet, state-owned enterprise, finance, and industrial robotics scenarios, with practical experience in domestic computing and AI platform delivery.',
+    '售前到量产全流程交付': 'From Presales to Mass Production',
+    '兼具方案设计、现场攻坚、跨部门协同与批量交付管理能力，可独立推进 POC 到订单落地。': 'Combines solution design, onsite troubleshooting, cross-functional coordination, and batch delivery management to drive POCs through order conversion.',
+    '标准化与长期价值沉淀': 'Standardization and Reusable Value',
+    '擅长将项目经验转化为可复用适配流程、测试规范与上线标准，为规模化部署提供稳定支撑。': 'Turns project experience into reusable adaptation workflows, test standards, and launch criteria for scalable deployments.',
+    '能力系统': 'Capability Systems',
+    'GPU POC 与客户验证': 'GPU POC and Customer Validation',
+    '测试环境搭建、用例设计、基准准入、模型训推适配、结果复盘和客户选型闭环。': 'Test environment setup, case design, benchmark entry, model training/inference adaptation, result review, and customer selection closure.',
+    'AI 集群交付': 'AI Cluster Delivery',
+    '机房从 0 搭建、硬件开箱验货、系统安装、GPU 驱动、RoCE 组网、基础测试和验收支持。': 'Data-room setup from zero, hardware inspection, OS installation, GPU driver deployment, RoCE networking, baseline testing, and acceptance support.',
+    '硬件测试与故障闭环': 'Hardware Testing and Issue Closure',
+    'CPU、内存、存储、背板、BIOS/BMC、网络压测、多系统兼容、可靠性测试和 RMA 闭环。': 'CPU, memory, storage, backplane, BIOS/BMC, network stress testing, multi-OS compatibility, reliability testing, and RMA closure.',
+    '大模型部署适配': 'LLM Deployment Adaptation',
+    'Llama3、DeepSeek、GLM、Qwen、WAN 等模型训练/推理适配、接口验证、日志定位和 SOP 沉淀。': 'Training/inference adaptation, API validation, log diagnosis, and SOP building for Llama3, DeepSeek, GLM, Qwen, WAN, and other models.',
+    '麒麟 / Ubuntu / Linux': 'Kylin / Ubuntu / Linux',
+    'MUSA / GPU 驱动': 'MUSA / GPU Drivers',
+    'RoCE 网络': 'RoCE Networking',
+    'RMA 故障闭环': 'RMA Issue Closure',
+    'AI 辅助脚本与工具化': 'AI-Assisted Scripts and Tooling',
+    'AI Coding 实验室': 'AI Coding Lab',
+    '把 FAE 现场重复劳动快速工具化': 'Turn Repetitive FAE Field Work into Tools',
+    '熟练使用自然语言驱动的 AI 辅助编程，把 GPU 环境检测、集群巡检、测试脚本生成、故障诊断、数据看板和产品资料制作变成可复用工具。': 'Use natural-language AI coding to turn GPU environment checks, cluster inspection, test script generation, issue diagnosis, data dashboards, and product materials into reusable tools.',
+    '运维脚本沉淀': 'Ops Scripts Built',
+    '项集群检查': 'Cluster Checks',
+    '套推理部署手册': 'Inference Deployment Guides',
+    '可视化交付': 'Visual Deliverables',
+    'Python / 集群巡检': 'Python / Cluster Inspection',
+    'KIMI3 集群节点巡检工具': 'KIMI3 Cluster Node Inspection Tool',
+    '面向 8 节点 MUSA/GPU 集群的“起飞门禁”巡检：单入口完成宿主机取证、MUSA/通信检查、门禁判定、离线 HTML 报告、证据包与节点隔离建议。': 'A launch-gate inspection tool for 8-node MUSA/GPU clusters: one entry for host evidence collection, MUSA/communication checks, GO/NO-GO judgment, offline HTML reports, evidence packages, and node isolation advice.',
+    '8 节点': '8 Nodes',
+    '43 项检查': '43 Checks',
+    'Bash / 故障取证': 'Bash / Issue Evidence',
+    '服务器故障日志一键收集': 'One-Click Server Fault Log Collection',
+    'S5000 服务器故障现场一键取证：系统信息、dmesg、journalctl、GPU 状态、驱动模块、GCD 错误转存、容器与网络日志自动采集打包。': 'One-click field evidence collection for S5000 server faults: system info, dmesg, journalctl, GPU status, driver modules, GCD error dumps, containers, and network logs packaged automatically.',
+    '8+ 类证据': '8+ Evidence Types',
+    '一键打包': 'One-Click Package',
+    '故障定位': 'Fault Diagnosis',
+    'Shell / SOP 沉淀': 'Shell / SOP Assets',
+    'GPU 集群运维脚本集': 'GPU Cluster Ops Script Suite',
+    '25+ 个可复用集群运维脚本，cluster_ops.sh 统一入口：巡检、SSH 全互信、hostname 治理、yum/dkms 修复、SDK 同步、模型下载监控与 RoCE/IB 诊断。': '25+ reusable cluster ops scripts with cluster_ops.sh as the unified entry: inspection, SSH mutual trust, hostname governance, yum/dkms repair, SDK sync, model download monitoring, and RoCE/IB diagnosis.',
+    '25+ 脚本': '25+ Scripts',
+    '统一入口': 'Unified Entry',
+    'Web / 3D 可视化': 'Web / 3D Visualization',
+    '每日盯盘 · 3D Market Deck': 'Daily Market Watch · 3D Market Deck',
+    '国内盘每日盯盘网页：自动抓取行情并以 3D 可视化呈现，深色科技风实时看板，用自动化替代人工盯盘。': 'A daily A-share market watch page that automatically fetches market data and presents it in a dark, technology-style 3D dashboard, replacing manual monitoring with automation.',
+    '实时行情': 'Live Market Data',
+    '3D 可视化': '3D Visualization',
+    '自动盯盘': 'Automated Watch',
+    '打开实验 →': 'Open Experiment →',
+    'source': 'source',
+    'live': 'live',
+    '3D / 工程制图': '3D / Engineering Drawings',
+    '星舰 V3 · 工程级 3D 交付': 'Starship V3 · Engineering-Grade 3D Delivery',
+    '从零完成星舰 V3 参数化 3D 建模、交互式查看器、爆炸图、零件图、装配图与 18 章维修手册，整套由 AI 编程生成并本地自检。': 'Built a parametric 3D Starship V3 model from scratch, including an interactive viewer, exploded views, part drawings, assembly drawings, and an 18-chapter maintenance manual, generated with AI coding and locally validated.',
+    '12 部件': '12 Parts',
+    '18 章手册': '18-Chapter Manual',
+    '摩尔线程产品介绍 · 互动演示': 'Moore Threads Product Introduction · Interactive Deck',
+    '用 AI 编程完成摩尔线程 GPU 产品介绍：28 页 HTML 互动演示与可编辑 PPTX 双版本，覆盖 S5000、万卡集群、软件生态与资本市场资料。': 'Created a Moore Threads GPU product introduction with AI coding: 28-page interactive HTML and editable PPTX versions covering S5000, ten-thousand-card clusters, software ecosystem, and capital-market materials.',
+    '28 页': '28 Pages',
+    'S5000 专题': 'S5000 Focus',
+    'Three.js / 3D 全息': 'Three.js / 3D Hologram',
+    'JARVIS 全息人形 · 3D Preview': 'JARVIS Holographic Figure · 3D Preview',
+    '基于 AI 生成参考图，用 Three.js 程序化重建半透明淡蓝白全息人形：胸口核心、环形数据轨道、粒子流、数据雨、冷蓝 Bloom 和可交互旋转视角。': 'Based on an AI-generated reference image, procedurally rebuilt a translucent blue-white holographic figure with Three.js: chest core, circular data orbits, particle streams, data rain, cool-blue Bloom, and interactive rotation.',
+    '全息粒子': 'Holographic Particles',
+    '可交互 3D': 'Interactive 3D',
+    'SGLang / PD 分离': 'SGLang / P-D Separation',
+    'DeepSeek V4 Flash PD 分离部署手册': 'DeepSeek V4 Flash P-D Separated Deployment Guide',
+    '将 DeepSeek V4 Flash 在 MUSA/SGLang 环境下的 Prefill、Decode、Router 分离部署流程整理成客户可执行手册，覆盖容器创建、一键拉起、日志定位、OpenAI 兼容接口验证和停服回滚。': 'Turned the DeepSeek V4 Flash Prefill, Decode, and Router separated deployment flow on MUSA/SGLang into a customer-executable guide covering container creation, one-click startup, log diagnosis, OpenAI-compatible API validation, shutdown, and rollback.',
+    '容器化部署': 'Containerized Deployment',
+    '客户手册': 'Customer Guide',
+    'P3D4 / 长上下文': 'P3D4 / Long Context',
+    'GLM5.2 PD 部署操作手册': 'GLM5.2 P-D Deployment Guide',
+    '面向 GLM5.2 FP8 模型的多节点 P/D 分离推理部署，沉淀拓扑说明、容器启动、通用环境变量、Prefill/Decode/Router 脚本、流式问答验证与日志排障路径。': 'A multi-node P/D separated inference deployment guide for the GLM5.2 FP8 model, covering topology, container startup, common environment variables, Prefill/Decode/Router scripts, streaming QA validation, and log troubleshooting.',
+    'P3D4 拓扑': 'P3D4 Topology',
+    '256K 上下文': '256K Context',
+    '流式验证': 'Streaming Validation',
+    '实验台与交付记录': 'Workbench and Delivery Logs',
+    '交付链路': 'Delivery Flow',
+    '自动化沉淀': 'Automation Assets',
+    '文档化输出': 'Documentation Output',
+    '从 POC 到批量交付': 'From POC to Batch Delivery',
+    '覆盖需求拆解、测试计划、服务器环境、GPU 驱动、RoCE 组网、模型验证、验收和问题闭环。': 'Covers requirement breakdown, test planning, server environment, GPU drivers, RoCE networking, model validation, acceptance, and issue closure.',
+    '客户需求 → 可执行测试项': 'Customer Needs → Executable Test Items',
+    'POC 现场 → 数据和问题闭环': 'POC Site → Data and Issue Closure',
+    '项目交付 → SOP 与复盘沉淀': 'Project Delivery → SOP and Review Assets',
+    '把现场经验变成工具': 'Turn Field Experience into Tools',
+    '用 AI Coding 把巡检、日志采集、部署脚本、产品资料和可视化页面沉淀为可复用资产。': 'Use AI Coding to turn inspection, log collection, deployment scripts, product materials, and visualization pages into reusable assets.',
+    '脚本统一入口与 dry-run': 'Unified Script Entry and dry-run',
+    '故障证据自动打包': 'Automatic Fault Evidence Packaging',
+    '交付页面和报告自动生成': 'Automatic Delivery Pages and Reports',
+    '客户可执行文档': 'Customer-Executable Documentation',
+    '把复杂部署流程写成客户能照着做的操作手册，减少现场沟通成本，并便于售后复用。': 'Turn complex deployment workflows into step-by-step customer manuals, reducing onsite communication cost and enabling after-sales reuse.',
+    '拓扑说明与启动顺序': 'Topology and Startup Order',
+    '接口验证与日志路径': 'API Validation and Log Paths',
+    '异常处理和回滚步骤': 'Exception Handling and Rollback Steps',
+    '代表项目': 'Representative Projects',
+    '信创': 'Domestic Computing',
+    '机器人': 'Robotics',
+    '2026.06 至今 · 云/零售': '2026.06 - Present · Cloud / Retail',
+    '京东云及零售 GPU 服务器项目': 'JD Cloud and Retail GPU Server Project',
+    '主导 POC、送测准入、基准验证、大模型训推适配，负责 500+ 台 AI 服务器批量交付。': 'Led POC, test-entry qualification, benchmark validation, LLM training/inference adaptation, and batch delivery of 500+ AI servers.',
+    'FAE 技术支持': 'FAE Technical Support',
+    '2025.10 至今 · 互联网': '2025.10 - Present · Internet',
+    '美团互联网客户 POC': 'Meituan Internet Customer POC',
+    '覆盖 Llama3 训练、DeepSeek 671B 双机推理、AI 平台和搜广推模型适配，客户满意度 98%。': 'Covered Llama3 training, DeepSeek 671B two-machine inference, AI platform adaptation, and search/ads/recommendation model adaptation, with 98% customer satisfaction.',
+    '年度算力集采中标': 'Annual Compute Procurement Win',
+    '2025.04 至今 · POC 负责人': '2025.04 - Present · POC Lead',
+    '快手 GPU 板卡/服务器 POC': 'Kuaishou GPU Card / Server POC',
+    '统筹送测准入、整机联调、功耗温控基线、大模型训练/推理适配，输出上线校验标准。': 'Coordinated test-entry qualification, system integration, power/thermal baselines, LLM training/inference adaptation, and launch validation standards.',
+    '客户选型验收通过': 'Customer Selection Accepted',
+    '2025.10 至今 · 央国企': '2025.10 - Present · State-Owned Enterprise',
+    '中电科智能院 AI 算力集群': 'CETC Intelligent Institute AI Compute Cluster',
+    '技术评分第一中标，完成 Qwen、DeepSeek-R1、WAN、GLM 等 9 款主流大模型适配调优。': 'Won with the highest technical score and completed adaptation/tuning for 9 mainstream models including Qwen, DeepSeek-R1, WAN, and GLM.',
+    '集群交付': 'Cluster Delivery',
+    '2022.03-2022.09 · 金融': '2022.03-2022.09 · Finance',
+    '邮储银行 GPU 图形卡集采': 'Postal Savings Bank GPU Graphics Card Procurement',
+    '协助信创 GPU 产品需求调研、兼容性测试与投标材料筹备，支撑 10 万张订单落地。': 'Supported domestic GPU requirement research, compatibility testing, and bid material preparation, helping land 100K card orders.',
+    '信创适配': 'Domestic Compatibility',
+    '2023.02-2024.11 · 金融/运营商': '2023.02-2024.11 · Finance / Carrier',
+    '工行/移动终端集采': 'ICBC / China Mobile Terminal Procurement',
+    '自研 GPU 图形卡终端场景适配验证与问题排查，通过集采技术资质审核，约 30 万张订单。': 'Validated and troubleshot self-developed GPU graphics cards in terminal scenarios, passed procurement technical qualification, and supported about 300K card orders.',
+    '技术资质审核': 'Technical Qualification Review',
+    '2024.02-2024.10 · 工业机器人': '2024.02-2024.10 · Industrial Robotics',
+    '东土科技工业机器人项目': 'Kyland Industrial Robotics Project',
+    '协助对接 ODM 与工业自动化合作伙伴，推进摩尔线程自研高算力 SOC 芯片与工业机器人场景的软硬件适配、采购需求梳理和落地交付。': 'Supported ODM and industrial automation partner alignment, driving Moore Threads self-developed high-compute SOC adaptation for industrial robotics scenarios, procurement requirement sorting, and delivery.',
+    '1 款工业机器人适配验证': '1 Industrial Robot Adaptation Validated',
+    '2025.12 至今 · 建筑设计': '2025.12 - Present · Architecture Design',
+    '雅江集团建研院国产图形工作站项目': 'Yajiang Group Research Institute Domestic Graphics Workstation Project',
+    '主导项目统筹，携手紫光计算机拉通需求、方案、测试链路，设计国产化图形工作站方案和多场景测试验证体系。': 'Led project coordination with Unis Computer, aligning requirements, solution, and testing workflow to design a domestic graphics workstation solution and multi-scenario validation system.',
+    '预计 3D 建模效率提升 90%': 'Expected 90% 3D Modeling Efficiency Improvement',
+    '2021.12 至今 · 产品支持': '2021.12 - Present · Product Support',
+    '公司大型展会产品支持': 'Major Company Event Product Support',
+    '负责新品发布会、MDC 2025 医疗板块、紫光销售大会、WAIC、中移动装备供应链大会等展会 Demo 部署与现场讲解。': 'Handled demo deployment and onsite explanation for product launches, MDC 2025 medical section, Unis sales conference, WAIC, and China Mobile equipment supply-chain conference.',
+    '50+ 讲解 / 30+ 意向线索': '50+ Presentations / 30+ Leads',
+    '工作经历': 'Career Experience',
+    '2021.11 - 至今': '2021.11 - Present',
+    '摩尔线程智能科技（北京）股份有限公司': 'Moore Threads Intelligent Technology (Beijing) Co., Ltd.',
+    'FAE · 人工智能硬件': 'FAE · AI Hardware',
+    '负责 AI GPU 产品全生命周期技术服务，覆盖大客户 POC、OEM 适配、服务器交付与故障闭环。': 'Responsible for full-lifecycle technical service for AI GPU products, covering key-account POCs, OEM adaptation, server delivery, and issue closure.',
+    '聚焦互联网、央国企等头部客户 AI GPU 服务器场景，提供整机基础测试、模型训推测试方案制定与执行。': 'Focused on AI GPU server scenarios for top internet and state-owned enterprise customers, providing system baseline testing and model training/inference test planning and execution.',
+    '累计支持 5+ 个 POC 项目，推进 3 家头部 OEM 客户量产，支撑 10+ 个 OEM 大型项目落地。': 'Supported 5+ POC projects, drove mass production for 3 top OEM customers, and supported 10+ major OEM projects.',
+    '主导大客户 GPU 服务器交付：机房搭建、硬件验货、系统安装、GPU 驱动部署、RoCE 组网、基础测试和交付验收。': 'Led key-account GPU server delivery: data-room setup, hardware inspection, OS installation, GPU driver deployment, RoCE networking, baseline testing, and delivery acceptance.',
+    '负责 GPU RMA 流程全管控，接收客户故障反馈，协调内部资源完成检测、分析、定位和解决方案落地。': 'Managed the full GPU RMA process, received customer fault feedback, and coordinated internal resources for testing, analysis, diagnosis, and solution delivery.',
+    '北京同方信息安全股份有限公司': 'Beijing Tongfang Information Security Co., Ltd.',
+    '测试运维 · 计算机硬件': 'Test Operations · Computer Hardware',
+    '负责硬件产品测试计划、功能/性能/兼容性验证、故障定位与测试报告输出。': 'Responsible for hardware test planning, functional/performance/compatibility validation, issue diagnosis, and test report output.',
+    '联动研发、生产、质量团队处理交付问题，保障产品稳定上线。': 'Worked with R&D, production, and quality teams to resolve delivery issues and ensure stable product launch.',
+    '联想北京信息技术有限公司': 'Lenovo Beijing Information Technology Co., Ltd.',
+    '测试开发 · 计算机硬件': 'Test Development · Computer Hardware',
+    '完成 30+ 款服务器硬件测试，覆盖 CPU、内存、存储、背板、BIOS/BMC、系统兼容性与可靠性。': 'Completed testing for 30+ server hardware models, covering CPU, memory, storage, backplane, BIOS/BMC, OS compatibility, and reliability.',
+    '开展网卡适配、网络压测、整机高负载稳定性、多操作系统兼容性和高低温、震动、跌落等可靠性测试。': 'Performed NIC adaptation, network stress testing, full-system high-load stability, multi-OS compatibility, and reliability tests including high/low temperature, vibration, and drop.',
+    '熟悉 IPMI、WebUI、远程部署和 Windows、Linux、麒麟等多操作系统测试环境。': 'Familiar with IPMI, WebUI, remote deployment, and multi-OS testing environments including Windows, Linux, and Kylin.',
+    '辽宁地质工程职业学院': 'Liaoning Geology Engineering Vocational College',
+    '2012.09 - 2015.06 · 金属矿产地质与勘查技术 · 大专': '2012.09 - 2015.06 · Metallic Mineral Geology and Exploration Technology · Associate Degree',
+    '与我联系': 'Contact Me',
+    'FAE 工程师 · AI 算力技术支持 · 北京': 'FAE Engineer · AI Compute Technical Support · Beijing',
+    '电话和微信号一致；按钮点击后会复制到剪贴板。': 'Phone and WeChat use the same number; click a button to copy it to the clipboard.',
+    '作品详情': 'Work Details',
+    '退出作品 ↩': 'Exit Work ↩',
+    '作品预览': 'Work Preview',
+    '原作品页面会在这里直接打开；如果浏览器限制嵌入，可使用备用入口新窗口查看。': 'The original work opens here directly; if browser embedding is restricted, use the fallback link to open it in a new window.',
+    '新窗口打开原作品 ↗': 'Open Original in New Window ↗',
+    '把 Prefill、Decode、Router 拆成可执行部署链路，用工程化 SOP 覆盖容器环境、启动顺序、OpenAI 兼容验证、日志定位和停服回滚。公开展示版已脱敏处理，保留方法论和交付结构。': 'Break Prefill, Decode, and Router into an executable deployment workflow, using engineering SOPs to cover container environment, startup order, OpenAI-compatible validation, log diagnosis, shutdown, and rollback. The public version is sanitized while preserving methodology and delivery structure.',
+    '推理拓扑': 'Inference Topology',
+    '服务框架': 'Service Framework',
+    '客户可执行': 'Customer Executable',
+    '交付价值': 'Delivery Value',
+    '把复杂模型部署拆成“环境确认 → 容器启动 → 服务拉起 → 接口验证 → 日志排障 → 停服回滚”的闭环，减少现场沟通成本。': 'Break complex model deployment into a closed loop of environment check, container startup, service launch, API validation, log troubleshooting, shutdown, and rollback to reduce onsite communication cost.',
+    '技术重点': 'Technical Focus',
+    '关注 P/D 分离拓扑、Router 转发关系、GPU 资源隔离、服务健康检查和 OpenAI 兼容接口验证，便于客户按步骤复现。': 'Focus on P/D separation topology, Router forwarding, GPU resource isolation, service health checks, and OpenAI-compatible API validation so customers can reproduce the process step by step.',
+    '可复用沉淀': 'Reusable Assets',
+    '把一次部署经验整理成标准手册模板，后续同类型模型、同类集群、同类客户 POC 可以快速复用。': 'Turn one deployment experience into a standard manual template that can be reused for similar models, clusters, and customer POCs.',
+    '确认基础环境、容器镜像和模型目录。': 'Confirm base environment, container image, and model directory.',
+    '按 Prefill、Decode、Router 顺序拉起服务。': 'Start services in Prefill, Decode, and Router order.',
+    '用兼容接口完成非流式、流式和异常路径验证。': 'Validate non-streaming, streaming, and exception paths through compatible APIs.',
+    '定位日志、保存证据、执行停服或回滚。': 'Locate logs, save evidence, and execute shutdown or rollback.',
+    '面向长上下文推理场景，整理多节点 P/D 分离部署流程，覆盖拓扑规划、容器启动、通用环境变量、脚本化拉起、流式问答验证与日志排障。': 'For long-context inference scenarios, organize multi-node P/D separated deployment covering topology planning, container startup, shared environment variables, scripted launch, streaming QA validation, and log troubleshooting.',
+    '多节点拓扑': 'Multi-Node Topology',
+    '长上下文': 'Long Context',
+    '模型部署': 'Model Deployment',
+    '把多节点推理部署从“经验口述”变成结构化手册，明确角色分工、启动顺序、验证方法和排障入口。': 'Turn multi-node inference deployment from spoken experience into a structured manual with clear roles, startup order, validation methods, and troubleshooting entry points.',
+    '强调 Prefill/Decode/Router 的分工、跨节点协同、长上下文能力验证、流式响应稳定性和日志链路。': 'Emphasize Prefill/Decode/Router roles, cross-node collaboration, long-context validation, streaming response stability, and log chains.',
+    '沉淀为客户交付模板后，可用于同类大模型 POC、集群扩容、售后复盘和新人交接。': 'After being packaged as a customer delivery template, it can support similar LLM POCs, cluster expansion, after-sales review, and onboarding.',
+    '规划 P/D 节点角色、模型位置和服务端口。': 'Plan P/D node roles, model locations, and service ports.',
+    '统一环境变量与容器参数，降低节点差异。': 'Unify environment variables and container parameters to reduce node differences.',
+    '逐层验证 Router、Decode、Prefill 的健康状态。': 'Validate Router, Decode, and Prefill health status layer by layer.',
+    '完成长上下文与流式问答测试，输出验收结论。': 'Complete long-context and streaming QA tests, then output acceptance conclusions.',
+    '© 2026 周猛 Jack Zhou · FAE Engineer · AI Compute': '© 2026 Jack Zhou · FAE Engineer · AI Compute'
   }
-  return c;
-}
-function hexToRgba(hex, a) {
-  const n = parseInt(hex.slice(1), 16);
-  return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`;
+};
+
+translations.en['切换强调色'] = 'Switch Accent';
+translations.en['选择强调色'] = 'Select Accent';
+translations.en['切换明暗模式'] = 'Switch Theme';
+translations.en['切换到深色模式'] = 'Switch to Dark Mode';
+translations.en['切换到浅色模式'] = 'Switch to Light Mode';
+translations.en['切换为英文'] = 'Switch to English';
+translations.en['切换为中文'] = 'Switch to Chinese';
+translations.en['打开导航菜单'] = 'Open Navigation Menu';
+translations.en['关闭导航菜单'] = 'Close Navigation Menu';
+
+let currentLanguage = 'zh';
+let i18nTextNodes = [];
+let heroTypeTimer = null;
+
+const interactiveCardSelector = [
+  '.console-card',
+  '.brief-main',
+  '.brief-card',
+  '.advantage-grid article',
+  '.system-card',
+  '.work-card',
+  '.proj-card',
+  '.timeline-card',
+  '.contact-card',
+  '.terminal-panel',
+  '.bench-panel',
+  '.education-card'
+].join(', ');
+
+function readPreference(key, fallback) {
+  try {
+    return window.localStorage?.getItem(key) || fallback;
+  } catch (error) {
+    return fallback;
+  }
 }
 
-// 恒星光谱：白 / 淡黄 / 蓝白 / 青 / 橙红，比例接近真实
-const STAR_TYPES = [
-  ['#ffffff', 0.60],   // 白
-  ['#ffe9c4', 0.15],   // 淡黄（类太阳）
-  ['#cfe0ff', 0.12],   // 蓝白（高温）
-  ['#aef7ff', 0.08],   // 青
-  ['#ffc98f', 0.04],   // 橙（冷巨星）
-  ['#ff9d9d', 0.01]    // 红（超巨星）
-];
-const sprites = {};
-STAR_TYPES.forEach(([color]) => {
-  sprites[color + ':n'] = makeStarSprite(color, false);
-  sprites[color + ':s'] = makeStarSprite(color, true);   // 带星芒
-});
+function writePreference(key, value) {
+  try {
+    window.localStorage?.setItem(key, value);
+  } catch (error) {
+    // 个别嵌入式浏览器会限制 localStorage；交互状态仍在当前页面即时生效。
+  }
+}
 
-const N = Math.min(700, Math.floor(innerWidth * innerHeight / 2000));
-const stars = [];
-for (let i = 0; i < N; i++) {
-  const r = 260 + Math.random() * 740;
-  const theta = Math.random() * PI2;
-  const phi = Math.acos(2 * Math.random() - 1);
-  // 按概率选颜色
-  let rnd = Math.random(), color = '#ffffff';
-  for (const [c, p] of STAR_TYPES) { rnd -= p; if (rnd <= 0) { color = c; break; } }
-  const bright = Math.random() < 0.10;   // 10% 亮星（大、带星芒）
-  stars.push({
-    x: r * Math.sin(phi) * Math.cos(theta),
-    y: r * Math.sin(phi) * Math.sin(theta),
-    z: r * Math.cos(phi),
-    color,
-    bright,
-    size: bright ? 0.9 + Math.random() * 1.1 : 0.4 + Math.random() * 0.7,
-    tw: Math.random() * PI2,
-    ts: 0.4 + Math.random() * 1.8,
-    base: 0.5 + Math.random() * 0.5
+function translateLabel(label, lang = currentLanguage) {
+  if (lang !== 'en') return label;
+  return translations.en[label] || label;
+}
+
+function collectI18nTargets() {
+  if (i18nTextNodes.length) return;
+  const ignoredTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'CANVAS']);
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode(node) {
+        if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+        if (ignoredTags.has(node.parentElement?.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+
+  while (walker.nextNode()) {
+    i18nTextNodes.push({
+      node: walker.currentNode,
+      original: walker.currentNode.nodeValue
+    });
+  }
+}
+
+function translateNodeValue(original, lang) {
+  if (lang !== 'en') return original;
+  const trimmed = original.trim();
+  const translated = translations.en[trimmed];
+  if (!translated) return original;
+  return original.replace(trimmed, translated);
+}
+
+function setTranslatedAttribute(el, attr, zhValue, lang = currentLanguage) {
+  if (!el || !zhValue) return;
+  el.setAttribute(attr, translateLabel(zhValue, lang));
+}
+
+function applyLanguage(lang) {
+  const value = lang === 'en' ? 'en' : 'zh';
+  currentLanguage = value;
+  collectI18nTargets();
+
+  document.documentElement.lang = value === 'en' ? 'en' : 'zh-CN';
+  document.body.dataset.lang = value;
+  document.title = value === 'en'
+    ? 'Jack Zhou · FAE Engineer · AI Compute Technical Support'
+    : zhPageTitle;
+  if (metaDescription) {
+    metaDescription.setAttribute('content', value === 'en'
+      ? 'Jack Zhou, FAE Engineer focused on AI compute technical support, GPU server POC, domestic computing adaptation, LLM training/inference, cluster delivery, and key-account support.'
+      : zhMetaDescription);
+  }
+
+  i18nTextNodes.forEach(item => {
+    item.node.nodeValue = translateNodeValue(item.original, value);
+  });
+
+  if (languageToggle) {
+    languageToggle.textContent = value === 'en' ? '中文' : 'EN';
+    setTranslatedAttribute(languageToggle, 'aria-label', value === 'en' ? '切换为中文' : '切换为英文', value);
+    setTranslatedAttribute(languageToggle, 'title', value === 'en' ? '切换为中文' : '切换为英文', value);
+  }
+
+  setTranslatedAttribute(paletteToggle, 'aria-label', '选择强调色', value);
+  setTranslatedAttribute(paletteToggle, 'title', '选择强调色', value);
+  setTranslatedAttribute(themeToggle, 'aria-label', '切换明暗模式', value);
+  applyTheme(document.documentElement.dataset.theme);
+  setMobileNav(navLinks?.classList.contains('is-open'));
+  startHeroTypewriter();
+}
+
+function applyTheme(theme) {
+  const value = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = value;
+  themeToggle?.setAttribute('aria-pressed', String(value === 'light'));
+  themeToggle?.setAttribute('title', value === 'light'
+    ? translateLabel('切换到深色模式')
+    : translateLabel('切换到浅色模式'));
+}
+
+function applyAccent(accent) {
+  const alias = { amber: 'golden', violet: 'purple', green: 'emerald' };
+  const normalized = alias[accent] || accent;
+  const value = accents.includes(normalized) ? normalized : 'rose';
+  document.documentElement.dataset.accent = value;
+  paletteToggle?.setAttribute('data-accent-current', value);
+  paletteOptions.forEach(option => {
+    const active = option.dataset.accentOption === value;
+    option.classList.toggle('is-active', active);
+    option.setAttribute('aria-checked', String(active));
   });
 }
 
-/* ---------- 远处星系 ---------- */
-const galaxies = [];
-function initGalaxies() {
-  galaxies.length = 0;
-  const seeds = [
-    [0.12, 0.20, 0.10, '#78b4ff'], [0.88, 0.26, 0.12, '#c882ff'],
-    [0.80, 0.74, 0.08, '#8cdcff'], [0.20, 0.80, 0.11, '#ff96be']
-  ];
-  for (const [fx, fy, fr, color] of seeds) {
-    galaxies.push({ x: W * fx, y: H * fy, r: Math.min(W, H) * fr, color });
-  }
-}
-initGalaxies();
-addEventListener('resize', initGalaxies);
-
-function drawGalaxies() {
-  for (const g of galaxies) {
-    const grad = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, g.r);
-    grad.addColorStop(0, hexToRgba(g.color, 0.16));
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.ellipse(g.x, g.y, g.r, g.r * 0.5, -0.4, 0, PI2);
-    ctx.fill();
-  }
+function setPaletteMenu(open) {
+  if (!paletteToggle || !paletteMenu) return;
+  paletteMenu.hidden = !open;
+  paletteToggle.setAttribute('aria-expanded', String(open));
+  themePicker?.classList.toggle('is-open', open);
 }
 
-/* ---------- 3D 星空渲染 ---------- */
-let rotY = 0, rotX = -0.12;
-const mouse = { x: 0, y: 0 };
-const FOV = 700;
-addEventListener('mousemove', e => {
-  mouse.x = e.clientX / W - 0.5;
-  mouse.y = e.clientY / H - 0.5;
+applyTheme(readPreference(THEME_KEY, 'dark'));
+applyAccent(readPreference(ACCENT_KEY, 'rose'));
+
+themeToggle?.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  writePreference(THEME_KEY, next);
 });
 
-function frame(t) {
-  rotX += (-mouse.y * 0.5 - rotX) * 0.04;
-  rotY += 0.0012 + mouse.x * 0.0006;
+paletteToggle?.addEventListener('click', () => {
+  setPaletteMenu(paletteMenu?.hidden !== false);
+});
 
-  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-  const cx = W / 2, cy = H / 2;
+paletteOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    const next = option.dataset.accentOption || 'rose';
+    applyAccent(next);
+    writePreference(ACCENT_KEY, next);
+    setPaletteMenu(false);
+  });
+});
 
-  ctx.clearRect(0, 0, W, H);
-  // 若使用视频背景，只画星空（透明画布，视频从下方透出）；黑洞/星系已由视频替代
-  // drawBlackHole(t);   // 已由 bg.mp4 视频背景替代
-  // drawGalaxies();     // 已由 bg.mp4 视频背景替代
+languageToggle?.addEventListener('click', () => {
+  const next = currentLanguage === 'en' ? 'zh' : 'en';
+  applyLanguage(next);
+  writePreference(LANG_KEY, next);
+});
 
-  // 最前层：3D 星空（透视投影，星星掠过黑洞前方）
-  for (const s of stars) {
-    let x = s.x * cosY + s.z * sinY;
-    let z = -s.x * sinY + s.z * cosY;
-    let y = s.y;
-    const y2 = y * cosX - z * sinX;
-    const z2 = y * sinX + z * cosX;
-    y = y2; z = z2;
+document.addEventListener('click', event => {
+  if (!paletteMenu || paletteMenu.hidden) return;
+  if (themePicker?.contains(event.target)) return;
+  setPaletteMenu(false);
+});
 
-    if (z < -FOV + 60) continue;
-    const scale = FOV / (FOV + z);
-    const sx = cx + x * scale;
-    const sy = cy + y * scale;
-    if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) continue;
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setPaletteMenu(false);
+});
 
-    const depth = Math.max(0.12, 1 - z / 1000);
-    const twinkle = s.base * (0.7 + 0.3 * Math.sin(s.tw + t * 0.001 * s.ts));
-    const alpha = Math.max(0.05, twinkle * depth);
-    const sprite = sprites[s.color + (s.bright ? ':s' : ':n')];
-    // 近大远小：显示尺寸随深度缩放
-    const drawSize = s.size * depth * 14;
+function setupCursorEffects() {
+  if (!cursorAura || !cursorDot) return;
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    ctx.globalAlpha = alpha;
-    ctx.drawImage(sprite, sx - drawSize / 2, sy - drawSize / 2, drawSize, drawSize);
-  }
-  ctx.globalAlpha = 1;
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
+  document.body.classList.add('has-cursor-fx');
+  let lastTrail = 0;
+  let activeCard = null;
 
-/* ---------- 打字机姓名 ---------- */
-const nameText = '周猛 · Jack Zhou';
-const typeEl = document.getElementById('typeTarget');
-let idx = 0;
-function typeName() {
-  if (idx <= nameText.length) {
-    typeEl.innerHTML = nameText.slice(0, idx) + (idx < nameText.length ? '<span class="typing-caret">▊</span>' : '');
-    idx++;
-    setTimeout(typeName, 120);
-  }
-}
-setTimeout(typeName, 1500);
+  const setActiveCard = card => {
+    if (card === activeCard) return;
+    activeCard?.classList.remove('is-card-hot');
+    activeCard = card;
+    activeCard?.classList.add('is-card-hot');
+  };
 
-/* ---------- 环形技能进度条 ---------- */
-const RING_C = 327;
-const skillObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const ring = entry.target;
-      const value = parseInt(ring.dataset.value, 10);
-      ring.querySelector('.progress').style.strokeDashoffset = RING_C * (1 - value / 100);
-      skillObserver.unobserve(ring);
+  document.addEventListener('pointermove', event => {
+    const x = event.clientX;
+    const y = event.clientY;
+    document.documentElement.style.setProperty('--mx', `${x}px`);
+    document.documentElement.style.setProperty('--my', `${y}px`);
+    cursorAura.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    cursorDot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+    const now = performance.now();
+    if (now - lastTrail > 36) {
+      lastTrail = now;
+      const trail = document.createElement('span');
+      trail.className = 'cursor-trail';
+      trail.style.left = `${x}px`;
+      trail.style.top = `${y}px`;
+      document.body.appendChild(trail);
+      window.setTimeout(() => trail.remove(), 680);
+    }
+
+    setActiveCard(document.elementFromPoint(x, y)?.closest(interactiveCardSelector));
+  }, { passive: true });
+
+  document.addEventListener('pointerleave', () => setActiveCard(null));
+
+  document.addEventListener('pointerover', event => {
+    if (event.target.closest('a, button, [role="button"], .work-card, .proj-card, .system-card, .bench-panel, .contact-card')) {
+      document.body.classList.add('cursor-hover');
     }
   });
-}, { threshold: 0.4 });
-document.querySelectorAll('.skill-ring').forEach(ring => skillObserver.observe(ring));
 
-/* ---------- 项目卡片 3D 倾斜 ---------- */
-document.querySelectorAll('.tilt').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r = card.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    card.style.transform = `rotateY(${px * 12}deg) rotateX(${-py * 12}deg) translateZ(8px)`;
+  document.addEventListener('pointerout', event => {
+    if (event.target.closest('a, button, [role="button"], .work-card, .proj-card, .system-card, .bench-panel, .contact-card')) {
+      document.body.classList.remove('cursor-hover');
+    }
   });
-  card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0)'; });
-});
 
-/* ---------- 作品卡片：翻转坠入详情 ---------- */
+  document.querySelectorAll(`.lab-section, ${interactiveCardSelector}`).forEach(card => {
+    card.addEventListener('pointermove', event => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--card-x', `${event.clientX - rect.left}px`);
+      card.style.setProperty('--card-y', `${event.clientY - rect.top}px`);
+    }, { passive: true });
+  });
+}
+
+setupCursorEffects();
+
+function setupCardInteractions() {
+  document.addEventListener('pointerdown', event => {
+    const card = document.elementFromPoint(event.clientX, event.clientY)?.closest(interactiveCardSelector);
+    if (!card) return;
+    card.classList.remove('is-pressing');
+    void card.offsetWidth;
+    card.classList.add('is-pressing');
+    window.setTimeout(() => card.classList.remove('is-pressing'), 420);
+  });
+
+  document.querySelectorAll(interactiveCardSelector).forEach(card => {
+    if (!card.querySelector(':scope > .card-rail')) {
+      const rail = document.createElement('span');
+      rail.className = 'card-rail';
+      rail.setAttribute('aria-hidden', 'true');
+      card.appendChild(rail);
+    }
+
+    card.addEventListener('pointerenter', () => {
+      card.classList.add('is-card-hot');
+    });
+
+    card.addEventListener('pointerleave', () => {
+      card.classList.remove('is-card-hot', 'is-pressing');
+    });
+
+  });
+}
+
+setupCardInteractions();
+
+function resizeCanvas() {
+  if (!canvas || !ctx) return;
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function makeParticles() {
+  const count = Math.min(120, Math.floor((window.innerWidth * window.innerHeight) / 13000));
+  return Array.from({ length: count }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    z: 0.35 + Math.random() * 0.9,
+    vx: -0.00008 + Math.random() * 0.00016,
+    vy: 0.00008 + Math.random() * 0.00022,
+    size: 0.7 + Math.random() * 1.8,
+    alpha: 0.12 + Math.random() * 0.28
+  }));
+}
+
+let particles = makeParticles();
+window.addEventListener('resize', () => { particles = makeParticles(); });
+
+function drawBackground() {
+  if (!ctx || !W || !H) return;
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < -0.04) p.x = 1.04;
+    if (p.x > 1.04) p.x = -0.04;
+    if (p.y > 1.04) p.y = -0.04;
+    const x = p.x * W;
+    const y = p.y * H;
+    ctx.beginPath();
+    ctx.arc(x, y, p.size * p.z, 0, PI2);
+    ctx.fillStyle = `rgba(216,166,58,${p.alpha})`;
+    ctx.fill();
+  });
+  ctx.restore();
+  window.requestAnimationFrame(drawBackground);
+}
+
+drawBackground();
+
+/* ---------- AI Compute Core：轻量 3D 算力核心 ---------- */
+function setupComputeCore() {
+  const host = document.getElementById('computeCore');
+  const coreCanvas = document.getElementById('computeCoreCanvas');
+  const modeEl = document.getElementById('computeCoreMode');
+  const coreCtx = coreCanvas?.getContext('2d');
+  if (!host || !coreCanvas || !coreCtx) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let width = 0;
+  let height = 0;
+  let angle = 0;
+  let pitch = -0.22;
+  let zoom = 1;
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+  let stateIndex = 0;
+  const states = ['AI COMPUTE CORE // READY', 'GPU POC // VALIDATING', 'CLUSTER DELIVERY // ONLINE'];
+  const points = Array.from({ length: 62 }, (_, index) => {
+    const t = (index + .5) / 62;
+    const y = 1 - 2 * t;
+    const radius = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = Math.PI * (3 - Math.sqrt(5)) * index;
+    return { x: Math.cos(theta) * radius, y, z: Math.sin(theta) * radius, size: 1 + (index % 4) * .35 };
+  });
+
+  function resize() {
+    const rect = host.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = Math.max(1, rect.width);
+    height = Math.max(1, rect.height);
+    coreCanvas.width = Math.round(width * dpr);
+    coreCanvas.height = Math.round(height * dpr);
+    coreCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function project(point) {
+    const cy = Math.cos(angle), sy = Math.sin(angle);
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const x1 = point.x * cy - point.z * sy;
+    const z1 = point.x * sy + point.z * cy;
+    const y1 = point.y * cp - z1 * sp;
+    const z2 = point.y * sp + z1 * cp;
+    const scale = (Math.min(width, height) * .27) * zoom;
+    return { x: width / 2 + x1 * scale, y: height / 2 + y1 * scale, z: z2, r: point.size * (1.2 + z2 * .55) };
+  }
+
+  function draw() {
+    coreCtx.clearRect(0, 0, width, height);
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--orange').trim() || '#f6bd16';
+    const hot = getComputedStyle(document.documentElement).getPropertyValue('--orange-hot').trim() || '#ff4f7b';
+    const glow = coreCtx.createRadialGradient(width / 2, height / 2, 2, width / 2, height / 2, width * .36);
+    glow.addColorStop(0, `${hot}55`); glow.addColorStop(.5, `${accent}18`); glow.addColorStop(1, 'transparent');
+    coreCtx.fillStyle = glow; coreCtx.fillRect(0, 0, width, height);
+
+    const ring = Math.min(width, height) * .28 * zoom;
+    coreCtx.save(); coreCtx.translate(width / 2, height / 2); coreCtx.rotate(angle * .35);
+    coreCtx.strokeStyle = `${accent}66`; coreCtx.lineWidth = 1;
+    coreCtx.beginPath(); coreCtx.ellipse(0, 0, ring, ring * .34, 0, 0, Math.PI * 2); coreCtx.stroke();
+    coreCtx.strokeStyle = `${hot}55`; coreCtx.setLineDash([3, 7]);
+    coreCtx.beginPath(); coreCtx.ellipse(0, 0, ring * .8, ring * .23, Math.PI * .48, 0, Math.PI * 2); coreCtx.stroke(); coreCtx.setLineDash([]); coreCtx.restore();
+
+    const projected = points.map(project).sort((a, b) => a.z - b.z);
+    projected.forEach((p, index) => {
+      const alpha = .28 + (p.z + 1) * .28;
+      coreCtx.fillStyle = index % 7 === 0 ? hot : accent;
+      coreCtx.globalAlpha = alpha;
+      coreCtx.beginPath(); coreCtx.arc(p.x, p.y, Math.max(.7, p.r), 0, PI2); coreCtx.fill();
+    });
+    coreCtx.globalAlpha = 1;
+    coreCtx.strokeStyle = `${accent}44`; coreCtx.lineWidth = 1;
+    coreCtx.beginPath(); coreCtx.moveTo(width * .26, height * .72); coreCtx.lineTo(width * .74, height * .28); coreCtx.stroke();
+    coreCtx.fillStyle = hot; coreCtx.globalAlpha = .95; coreCtx.beginPath(); coreCtx.arc(width / 2, height / 2, 3.5 + Math.sin(angle * 2) * 1.2, 0, PI2); coreCtx.fill(); coreCtx.globalAlpha = 1;
+    if (!reduceMotion && !dragging) angle += .0038;
+    window.requestAnimationFrame(draw);
+  }
+
+  host.addEventListener('pointerdown', event => { dragging = true; lastX = event.clientX; lastY = event.clientY; host.setPointerCapture?.(event.pointerId); });
+  host.addEventListener('pointermove', event => { if (!dragging) return; angle += (event.clientX - lastX) * .009; pitch = Math.max(-.9, Math.min(.9, pitch + (event.clientY - lastY) * .006)); lastX = event.clientX; lastY = event.clientY; });
+  host.addEventListener('pointerup', () => { dragging = false; });
+  host.addEventListener('pointercancel', () => { dragging = false; });
+  host.addEventListener('wheel', event => { event.preventDefault(); zoom = Math.max(.72, Math.min(1.34, zoom - event.deltaY * .0008)); }, { passive: false });
+  host.addEventListener('click', () => { if (modeEl) { stateIndex = (stateIndex + 1) % states.length; modeEl.textContent = states[stateIndex]; } });
+  window.addEventListener('resize', resize);
+  resize(); draw();
+}
+
+setupComputeCore();
+
+/* ---------- 首页姓名兜底 ---------- */
+const typeEl = document.getElementById('typeTarget');
+if (typeEl && !typeEl.textContent.trim()) {
+  typeEl.textContent = 'Jack Zhou';
+}
+
+function startHeroTypewriter() {
+  if (!typeEl) return;
+  window.clearTimeout(heroTypeTimer);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const phrases = currentLanguage === 'en'
+    ? ['Jack Zhou', 'AI Compute FAE', 'GPU POC Solver', 'Cluster Delivery']
+    : ['Jack Zhou', 'AI 算力 FAE', 'GPU POC Solver', '集群交付闭环'];
+
+  if (reducedMotion) {
+    typeEl.classList.remove('is-typing');
+    typeEl.textContent = phrases[0];
+    return;
+  }
+
+  typeEl.classList.add('is-typing');
+  let phraseIndex = 0;
+  let charIndex = 0;
+  let deleting = false;
+  const write = () => {
+    const phrase = phrases[phraseIndex];
+    typeEl.textContent = phrase.slice(0, charIndex);
+
+    if (!deleting && charIndex < phrase.length) {
+      charIndex += 1;
+      heroTypeTimer = window.setTimeout(write, 76 + Math.random() * 28);
+      return;
+    }
+
+    if (!deleting) {
+      deleting = true;
+      heroTypeTimer = window.setTimeout(write, 1500);
+      return;
+    }
+
+    if (deleting && charIndex > 0) {
+      charIndex -= 1;
+      heroTypeTimer = window.setTimeout(write, 38 + Math.random() * 20);
+      return;
+    }
+
+    deleting = false;
+    phraseIndex = (phraseIndex + 1) % phrases.length;
+    heroTypeTimer = window.setTimeout(write, 90);
+  };
+
+  charIndex = phrases[0].length;
+  typeEl.textContent = phrases[0];
+  heroTypeTimer = window.setTimeout(write, 1300);
+}
+
+/* ---------- 作品卡片：站内 Portal 详情 ---------- */
 const workReader = document.getElementById('workReader');
 const readerClose = document.getElementById('readerClose');
 const readerTitle = document.getElementById('readerTitle');
@@ -310,22 +770,22 @@ function openManual(manual, card) {
   externalWorkContent?.classList.toggle('is-active', Boolean(externalUrl));
 
   if (externalUrl) {
-    if (externalWorkTitle) externalWorkTitle.textContent = cardTitle || manualTitles[manual] || '作品预览';
-    if (externalWorkDesc) externalWorkDesc.textContent = cardDesc || '原作品页面会在这里直接打开；如果浏览器限制嵌入，可使用备用入口新窗口查看。';
+    if (externalWorkTitle) externalWorkTitle.textContent = cardTitle || translateLabel(manualTitles[manual] || '作品预览');
+    if (externalWorkDesc) externalWorkDesc.textContent = cardDesc || translateLabel('原作品页面会在这里直接打开；如果浏览器限制嵌入，可使用备用入口新窗口查看。');
     if (externalWorkLink) externalWorkLink.href = externalUrl;
     if (externalWorkFrame && externalWorkFrame.src !== externalUrl) externalWorkFrame.src = externalUrl;
   } else if (externalWorkFrame) {
     externalWorkFrame.removeAttribute('src');
   }
 
-  if (readerTitle) readerTitle.textContent = manualTitles[manual] || '作品详情';
+  if (readerTitle) readerTitle.textContent = translateLabel(manualTitles[manual] || '作品详情');
   workReader.hidden = false;
   workReader.setAttribute('aria-hidden', 'false');
   workReader.classList.remove('is-closing');
   workReader.classList.toggle('has-frame', Boolean(externalUrl));
   document.body.classList.add('reader-open');
 
-  requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
     workReader.classList.add('is-open');
     readerClose?.focus({ preventScroll: true });
   });
@@ -341,11 +801,10 @@ function closeManual() {
     activeManualCard.classList.add('is-returning');
   }
 
-  readerCloseTimer = setTimeout(() => {
+  readerCloseTimer = window.setTimeout(() => {
     workReader.hidden = true;
     workReader.setAttribute('aria-hidden', 'true');
-    workReader.classList.remove('is-closing');
-    workReader.classList.remove('has-frame');
+    workReader.classList.remove('is-closing', 'has-frame');
     document.body.classList.remove('reader-open');
     document.querySelectorAll('[data-manual-content]').forEach(content => content.classList.remove('is-active'));
     externalWorkContent?.classList.remove('is-active');
@@ -353,13 +812,14 @@ function closeManual() {
     if (activeManualCard) {
       activeManualCard.focus({ preventScroll: true });
       activeManualCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(() => activeManualCard?.classList.remove('is-returning'), 520);
+      window.setTimeout(() => activeManualCard?.classList.remove('is-returning'), 420);
     }
-  }, 430);
+  }, 300);
 }
 
 portalCards.forEach(card => {
   card.addEventListener('click', event => {
+    if (event.target.closest('.work-source')) return;
     const manual = event.target.closest('[data-manual-open]')?.dataset.manualOpen || card.dataset.manual;
     openManual(manual, card);
   });
@@ -379,541 +839,80 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && workReader && !workReader.hidden) closeManual();
 });
 
-/* ---------- 首页 3D 数字人语音交互 ---------- */
-const digitalHuman = document.getElementById('digitalHuman');
-const digitalHumanCanvas = document.getElementById('digitalHumanCanvas');
-const voiceStatus = document.getElementById('voiceStatus');
-const voiceTranscript = document.getElementById('voiceTranscript');
-const voiceSettingsToggle = document.getElementById('voiceSettingsToggle');
-const voiceSettings = document.getElementById('voiceSettings');
-const openaiTtsEndpoint = document.getElementById('openaiTtsEndpoint');
-const openaiVoiceSelect = document.getElementById('openaiVoiceSelect');
-const voiceSelect = document.getElementById('voiceSelect');
-const voiceRate = document.getElementById('voiceRate');
-const voicePitch = document.getElementById('voicePitch');
-const voiceRateValue = document.getElementById('voiceRateValue');
-const voicePitchValue = document.getElementById('voicePitchValue');
-const voiceTest = document.getElementById('voiceTest');
-const voiceSave = document.getElementById('voiceSave');
-const voiceReset = document.getElementById('voiceReset');
-let avatarSpeaking = false;
-let avatarListening = false;
-let preferredSweetVoice = null;
-const VOICE_SETTINGS_KEY = 'jackResumeVoiceSettings';
-const DEFAULT_VOICE_SETTINGS = {
-  provider: 'openai',
-  openaiEndpoint: '',
-  openaiVoice: 'coral',
-  voiceURI: '',
-  rate: 0.96,
-  pitch: 1.0,
-  volume: 1.0
-};
-let currentVoiceSettings = { ...DEFAULT_VOICE_SETTINGS };
-
-function loadVoiceSettings() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(VOICE_SETTINGS_KEY) || 'null');
-    currentVoiceSettings = {
-      ...DEFAULT_VOICE_SETTINGS,
-      ...(saved || {})
-    };
-  } catch (e) {
-    currentVoiceSettings = { ...DEFAULT_VOICE_SETTINGS };
-  }
-}
-
-function saveVoiceSettings() {
-  localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify(currentVoiceSettings));
-}
-
-function getAvailableVoices() {
-  return window.speechSynthesis?.getVoices?.() || [];
-}
-
-function pickSweetChineseVoice() {
-  const voices = getAvailableVoices();
-  if (!voices.length) return null;
-  if (currentVoiceSettings.voiceURI) {
-    const savedVoice = voices.find(voice => voice.voiceURI === currentVoiceSettings.voiceURI);
-    if (savedVoice) return savedVoice;
-  }
-  const sweetVoicePatterns = [
-    /tingting/i,
-    /meijia/i,
-    /sinji/i,
-    /mei-jia/i,
-    /xiaoxiao/i,
-    /xiaoyi/i,
-    /xiaomo/i,
-    /xiaorui/i,
-    /google.*中文/i,
-    /google.*普通话/i,
-    /mandarin.*female/i,
-    /chinese.*female/i,
-    /zh.*female/i,
-    /女声|女生|女性|甜|晓晓|晓伊|婷婷|美佳/i
-  ];
-  const zhVoices = voices.filter(voice => /zh|cmn|chinese|mandarin|中文|普通话|國語/i.test(`${voice.lang} ${voice.name}`));
-  return sweetVoicePatterns
-    .map(pattern => zhVoices.find(voice => pattern.test(`${voice.name} ${voice.lang}`)))
-    .find(Boolean) || zhVoices[0] || voices.find(voice => /female|woman|samantha|karen|ting/i.test(voice.name)) || null;
-}
-
-function refreshSweetVoice() {
-  preferredSweetVoice = pickSweetChineseVoice();
-}
-
-function syncVoiceControls() {
-  if (openaiTtsEndpoint) openaiTtsEndpoint.value = currentVoiceSettings.openaiEndpoint || '';
-  if (openaiVoiceSelect) openaiVoiceSelect.value = currentVoiceSettings.openaiVoice || DEFAULT_VOICE_SETTINGS.openaiVoice;
-  if (voiceRate) voiceRate.value = currentVoiceSettings.rate;
-  if (voicePitch) voicePitch.value = currentVoiceSettings.pitch;
-  if (voiceRateValue) voiceRateValue.textContent = Number(currentVoiceSettings.rate).toFixed(2);
-  if (voicePitchValue) voicePitchValue.textContent = Number(currentVoiceSettings.pitch).toFixed(2);
-}
-
-function populateVoiceSelect() {
-  if (!voiceSelect) return;
-  const voices = getAvailableVoices();
-  const previousValue = voiceSelect.value || currentVoiceSettings.voiceURI;
-  voiceSelect.innerHTML = '';
-
-  const autoOption = document.createElement('option');
-  autoOption.value = '';
-  autoOption.textContent = '自动选择中文声线';
-  voiceSelect.appendChild(autoOption);
-
-  voices.forEach(voice => {
-    const option = document.createElement('option');
-    option.value = voice.voiceURI;
-    option.textContent = `${voice.name} · ${voice.lang}${voice.default ? ' · 默认' : ''}`;
-    voiceSelect.appendChild(option);
-  });
-
-  voiceSelect.value = voices.some(voice => voice.voiceURI === previousValue) ? previousValue : '';
-}
-
-function refreshVoiceSettingsUI() {
-  populateVoiceSelect();
-  syncVoiceControls();
-  refreshSweetVoice();
-}
-
-loadVoiceSettings();
-
-if (window.speechSynthesis) {
-  refreshSweetVoice();
-  window.speechSynthesis.addEventListener?.('voiceschanged', refreshVoiceSettingsUI);
-}
-
-function setVoiceUI(status, text) {
-  if (voiceStatus) voiceStatus.textContent = status;
-  if (voiceTranscript) voiceTranscript.textContent = text;
-}
-
-let openaiAudioUrl = null;
-let openaiAudio = null;
-
-function finishAvatarSpeech() {
-  avatarSpeaking = false;
-  digitalHuman?.classList.remove('is-listening');
-  setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
-}
-
-function speakByBrowserTTS(text, status = '浏览器备用声线') {
-  setVoiceUI(status, text);
-  avatarSpeaking = true;
-  digitalHuman?.classList.add('is-listening');
-  try {
-    window.speechSynthesis.cancel();
-    refreshSweetVoice();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = Number(currentVoiceSettings.rate) || DEFAULT_VOICE_SETTINGS.rate;
-    utterance.pitch = Number(currentVoiceSettings.pitch) || DEFAULT_VOICE_SETTINGS.pitch;
-    utterance.volume = Number(currentVoiceSettings.volume) || DEFAULT_VOICE_SETTINGS.volume;
-    if (preferredSweetVoice) utterance.voice = preferredSweetVoice;
-    utterance.onend = finishAvatarSpeech;
-    utterance.onerror = () => {
-      finishAvatarSpeech();
-    };
-    window.speechSynthesis.speak(utterance);
-  } catch (e) {
-    finishAvatarSpeech();
-  }
-}
-
-async function speakByOpenAITTS(text) {
-  const endpoint = (currentVoiceSettings.openaiEndpoint || '').trim();
-  if (!endpoint) return false;
-
-  setVoiceUI('OpenAI 真人声生成中', text);
-  avatarSpeaking = true;
-  digitalHuman?.classList.add('is-listening');
-
-  if (openaiAudio) {
-    openaiAudio.pause();
-    openaiAudio = null;
-  }
-  if (openaiAudioUrl) {
-    URL.revokeObjectURL(openaiAudioUrl);
-    openaiAudioUrl = null;
-  }
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      text,
-      voice: currentVoiceSettings.openaiVoice || DEFAULT_VOICE_SETTINGS.openaiVoice,
-      instructions: '用年轻、亲切、自然的中文女声说话，声音干净甜美但不要夹，不要播音腔，语气像简历网站里的 AI 助手，轻快、有礼貌、不要夸张。'
-    })
-  });
-  if (!response.ok) throw new Error(`OpenAI TTS proxy failed: ${response.status}`);
-
-  const audioBlob = await response.blob();
-  if (!audioBlob.type.startsWith('audio/')) throw new Error('OpenAI TTS proxy did not return audio');
-
-  openaiAudioUrl = URL.createObjectURL(audioBlob);
-  openaiAudio = new Audio(openaiAudioUrl);
-  openaiAudio.onended = finishAvatarSpeech;
-  openaiAudio.onerror = finishAvatarSpeech;
-  setVoiceUI('OpenAI 真人声播放中', text);
-  await openaiAudio.play();
-  return true;
-}
-
-async function speakByAvatar(text) {
-  try {
-    if (await speakByOpenAITTS(text)) return;
-  } catch (e) {
-    setVoiceUI('OpenAI TTS 不可用', '已自动切回浏览器备用声线。请检查代理地址或后端 API Key。');
-  }
-  speakByBrowserTTS(text);
-}
-
-voiceSettingsToggle?.addEventListener('click', event => {
-  event.stopPropagation();
-  if (!voiceSettings) return;
-  const willOpen = voiceSettings.hidden;
-  voiceSettings.hidden = !willOpen;
-  voiceSettingsToggle.classList.toggle('is-active', willOpen);
-  if (willOpen) refreshVoiceSettingsUI();
-});
-
-openaiTtsEndpoint?.addEventListener('input', () => {
-  currentVoiceSettings.openaiEndpoint = openaiTtsEndpoint.value.trim();
-});
-
-openaiVoiceSelect?.addEventListener('change', () => {
-  currentVoiceSettings.openaiVoice = openaiVoiceSelect.value;
-});
-
-voiceSelect?.addEventListener('change', () => {
-  currentVoiceSettings.voiceURI = voiceSelect.value;
-  refreshSweetVoice();
-});
-
-voiceRate?.addEventListener('input', () => {
-  currentVoiceSettings.rate = Number(voiceRate.value);
-  syncVoiceControls();
-});
-
-voicePitch?.addEventListener('input', () => {
-  currentVoiceSettings.pitch = Number(voicePitch.value);
-  syncVoiceControls();
-});
-
-voiceTest?.addEventListener('click', () => {
-  speakByAvatar('你好呀，我是 Jack 的简历助手。这个声音如果舒服，就点保存。');
-});
-
-voiceSave?.addEventListener('click', () => {
-  currentVoiceSettings.openaiEndpoint = openaiTtsEndpoint?.value.trim() || '';
-  currentVoiceSettings.openaiVoice = openaiVoiceSelect?.value || DEFAULT_VOICE_SETTINGS.openaiVoice;
-  saveVoiceSettings();
-  setVoiceUI('声音已保存', currentVoiceSettings.openaiEndpoint ? '已优先使用 OpenAI 真人声；失败时自动切回浏览器声线。' : '未配置 OpenAI 代理，将继续使用浏览器备用声线。');
-});
-
-voiceReset?.addEventListener('click', () => {
-  currentVoiceSettings = { ...DEFAULT_VOICE_SETTINGS };
-  localStorage.removeItem(VOICE_SETTINGS_KEY);
-  refreshVoiceSettingsUI();
-  setVoiceUI('声音已重置', '已恢复自然声线参数，可以重新试听。');
-});
-
-document.addEventListener('click', event => {
-  if (!voiceSettings || voiceSettings.hidden) return;
-  if (voiceSettings.contains(event.target) || voiceSettingsToggle?.contains(event.target)) return;
-  voiceSettings.hidden = true;
-  voiceSettingsToggle?.classList.remove('is-active');
-});
-
-refreshVoiceSettingsUI();
-
-function answerResumeQuestion(rawText) {
-  const text = rawText.toLowerCase();
-  if (/项目|作品|案例|战绩|project/.test(text)) {
-    location.hash = '#projects';
-    return '好呀，我带你看项目。这里能看到 GPU 交付、国产化适配、客户 POC，还有 AI Coding 作品。';
-  }
-  if (/ai|coding|编程|代码|工具|自动化/.test(text)) {
-    location.hash = '#aicoding';
-    return '来啦，这里是 AI Coding 作品集。重点是把现场经验变成可复用的小工具和交付页面。';
-  }
-  if (/经历|经验|工作|公司|背景/.test(text)) {
-    location.hash = '#experience';
-    return 'Jack 有近十年服务器和 AI 算力服务经验，做过联想、同方、摩尔线程相关项目，偏现场攻坚型。';
-  }
-  if (/联系|电话|微信|邮箱|contact/.test(text)) {
-    location.hash = '#contact';
-    return '好的，联系区在这里。电话、邮箱、微信都可以复制，微信号就是手机号。';
-  }
-  if (/能力|技能|会什么|擅长/.test(text)) {
-    location.hash = '#skills';
-    return '核心能力是 GPU POC、集群交付、硬件测试、模型适配、RoCE 网络和故障闭环。';
-  }
-  return '你好呀，我是 Jack 的 3D 简历助手。你可以问我项目、经历、AI Coding、能力或者联系方式。';
-}
-
-function initVoiceAssistant() {
-  if (!digitalHuman) return;
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition = null;
-
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'zh-CN';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => {
-      avatarListening = true;
-      digitalHuman.classList.add('is-listening');
-      setVoiceUI('正在听你说', '请说：项目 / 经历 / AI Coding / 联系方式');
-    };
-    recognition.onresult = event => {
-      let interim = '';
-      let finalText = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const part = event.results[i][0]?.transcript || '';
-        if (event.results[i].isFinal) finalText += part;
-        else interim += part;
-      }
-      setVoiceUI('语音识别中', finalText || interim || '继续说，我在听');
-      if (finalText) speakByAvatar(answerResumeQuestion(finalText));
-    };
-    recognition.onerror = event => {
-      avatarListening = false;
-      digitalHuman.classList.remove('is-listening');
-      const tip = event.error === 'not-allowed' ? '浏览器没有麦克风权限，可允许后再点我。' : '语音识别中断，点我可以重试。';
-      setVoiceUI('语音未启动', tip);
-    };
-    recognition.onend = () => {
-      avatarListening = false;
-      if (!avatarSpeaking) {
-        digitalHuman.classList.remove('is-listening');
-        setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
-      }
-    };
-  }
-
-  digitalHuman.addEventListener('click', () => {
-    if (window.speechSynthesis?.speaking) {
-      window.speechSynthesis.cancel();
-      avatarSpeaking = false;
-      digitalHuman.classList.remove('is-listening');
-      setVoiceUI('点击唤醒', '可问：项目、经历、AI Coding、联系方式');
-      return;
-    }
-    if (!recognition) {
-      speakByAvatar('当前浏览器不支持语音识别，不过我可以先做语音介绍。你可以看看项目、经历、AI Coding 和联系方式。');
-      return;
-    }
-    try {
-      if (avatarListening) recognition.stop();
-      else recognition.start();
-    } catch (e) {
-      setVoiceUI('稍等一下', '语音模块正在重置，1 秒后再点我。');
-    }
+/* ---------- 参考站等价功能：作品/项目筛选 ---------- */
+function setupFilter(buttonSelector, itemSelector, attrName) {
+  const buttons = document.querySelectorAll(buttonSelector);
+  const items = document.querySelectorAll(itemSelector);
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const value = button.dataset[attrName];
+      buttons.forEach(item => item.classList.toggle('is-active', item === button));
+      items.forEach(item => {
+        const kinds = (item.dataset.workKind || item.dataset.projectKind || '').split(/\s+/);
+        const visible = value === 'all' || kinds.includes(value);
+        item.hidden = !visible;
+      });
+    });
   });
 }
 
-function initDigitalHuman3D() {
-  if (!digitalHumanCanvas) return;
-  import('https://unpkg.com/three@0.160.1/build/three.module.js').then(THREE => {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-    camera.position.set(0, 0.15, 5.4);
+setupFilter('[data-work-filter]', '[data-work-kind]', 'workFilter');
+setupFilter('[data-project-filter]', '[data-project-kind]', 'projectFilter');
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas: digitalHumanCanvas,
-      alpha: true,
-      antialias: true
+/* ---------- 参考站等价功能：Workbench 标签切换 ---------- */
+const benchTabs = document.querySelectorAll('[data-bench-tab]');
+const benchPanels = document.querySelectorAll('[data-bench-panel]');
+benchTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const key = tab.dataset.benchTab;
+    benchTabs.forEach(item => {
+      const active = item === tab;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-selected', String(active));
     });
-    renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    const avatar = new THREE.Group();
-    scene.add(avatar);
-
-    const cyanMat = new THREE.MeshPhysicalMaterial({
-      color: 0x8ff7ff,
-      emissive: 0x00d9ff,
-      emissiveIntensity: 1.45,
-      transparent: true,
-      opacity: 0.42,
-      roughness: 0.18,
-      metalness: 0.08,
-      transmission: 0.45,
-      thickness: 0.2
+    benchPanels.forEach(panel => {
+      panel.classList.toggle('is-active', panel.dataset.benchPanel === key);
     });
-    const whiteMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.82
-    });
-    const lineMat = new THREE.MeshBasicMaterial({
-      color: 0x00f3ff,
-      transparent: true,
-      opacity: 0.55,
-      wireframe: true
-    });
-
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.46, 1.18, 10, 22), cyanMat);
-    body.position.y = -0.42;
-    body.scale.set(0.82, 1, 0.44);
-    avatar.add(body);
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 32, 24), cyanMat);
-    head.position.y = 0.78;
-    head.scale.set(0.88, 1.05, 0.78);
-    avatar.add(head);
-
-    const torsoWire = new THREE.Mesh(new THREE.CapsuleGeometry(0.49, 1.2, 8, 14), lineMat);
-    torsoWire.position.copy(body.position);
-    torsoWire.scale.copy(body.scale).multiplyScalar(1.02);
-    avatar.add(torsoWire);
-
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 16), whiteMat);
-    core.position.set(0, 0.02, 0.18);
-    avatar.add(core);
-
-    const halo1 = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.008, 8, 96), whiteMat);
-    halo1.rotation.x = Math.PI / 2.7;
-    halo1.position.y = 0.1;
-    avatar.add(halo1);
-
-    const halo2 = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.006, 8, 96), lineMat);
-    halo2.rotation.x = Math.PI / 2.15;
-    halo2.position.y = 0.62;
-    avatar.add(halo2);
-
-    const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.82, 8, 12), cyanMat);
-    leftArm.position.set(-0.55, -0.12, 0);
-    leftArm.rotation.z = -0.32;
-    avatar.add(leftArm);
-    const rightArm = leftArm.clone();
-    rightArm.position.x = 0.55;
-    rightArm.rotation.z = 0.32;
-    avatar.add(rightArm);
-
-    const particleGeo = new THREE.BufferGeometry();
-    const particleCount = 120;
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const r = 0.45 + Math.random() * 0.76;
-      const a = Math.random() * Math.PI * 2;
-      positions[i * 3] = Math.cos(a) * r;
-      positions[i * 3 + 1] = -0.78 + Math.random() * 1.86;
-      positions[i * 3 + 2] = Math.sin(a) * r * 0.35;
-    }
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
-      color: 0x9df8ff,
-      size: 0.025,
-      transparent: true,
-      opacity: 0.72
-    }));
-    avatar.add(particles);
-
-    scene.add(new THREE.AmbientLight(0x7cf6ff, 1.2));
-    const key = new THREE.PointLight(0x00f3ff, 4, 8);
-    key.position.set(1.7, 2.2, 3.2);
-    scene.add(key);
-    const rim = new THREE.PointLight(0xbc13fe, 2.5, 8);
-    rim.position.set(-2.5, 1.2, 2.2);
-    scene.add(rim);
-
-    function resizeAvatarRenderer() {
-      const rect = digitalHumanCanvas.getBoundingClientRect();
-      const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height)));
-      renderer.setSize(size, size, false);
-      camera.aspect = 1;
-      camera.updateProjectionMatrix();
-    }
-    resizeAvatarRenderer();
-    window.addEventListener('resize', resizeAvatarRenderer);
-
-    function animateAvatar(t) {
-      const time = t * 0.001;
-      const activeBoost = avatarSpeaking || avatarListening ? 1.55 : 1;
-      avatar.rotation.y = Math.sin(time * 0.7) * 0.22;
-      avatar.position.y = Math.sin(time * 1.5) * 0.04;
-      core.scale.setScalar((1.15 + Math.sin(time * 7) * 0.2) * activeBoost);
-      halo1.rotation.z = time * 0.75;
-      halo2.rotation.z = -time * 1.05;
-      particles.rotation.y = time * 0.28;
-      particles.rotation.z = Math.sin(time * 0.6) * 0.08;
-      renderer.render(scene, camera);
-      requestAnimationFrame(animateAvatar);
-    }
-    requestAnimationFrame(animateAvatar);
-  }).catch(() => {
-    setVoiceUI('3D 加载失败', '网络拦截了 Three.js，语音助手仍可点击使用。');
   });
-}
+});
 
-initVoiceAssistant();
-initDigitalHuman3D();
+/* ---------- 项目卡片轻量倾斜 ---------- */
+document.querySelectorAll('.tilt').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `rotateY(${px * 4}deg) rotateX(${-py * 4}deg) translateY(-2px)`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+});
 
-/* ---------- 联系按钮：复制 + 音效 ---------- */
-function beep() {
-  try {
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ac.createOscillator(), gain = ac.createGain();
-    osc.type = 'square'; osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.15, ac.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
-    osc.connect(gain); gain.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime + 0.15);
-  } catch (e) {}
-}
+/* ---------- 联系按钮：复制反馈 ---------- */
 const copyTip = document.getElementById('copyTip');
 document.querySelectorAll('.contact-btn[data-copy]').forEach(btn => {
   btn.addEventListener('click', () => {
     const val = btn.dataset.copy;
     navigator.clipboard.writeText(val).then(() => {
-      beep();
-      copyTip.textContent = '✓ 已复制：' + val;
-      setTimeout(() => { copyTip.textContent = ''; }, 2000);
-    }).catch(() => { copyTip.textContent = '复制失败，请手动复制：' + val; });
+      if (copyTip) copyTip.textContent = currentLanguage === 'en' ? '✓ Copied: ' + val : '✓ 已复制：' + val;
+      window.setTimeout(() => { if (copyTip) copyTip.textContent = ''; }, 2000);
+    }).catch(() => {
+      if (copyTip) copyTip.textContent = currentLanguage === 'en' ? 'Copy failed. Please copy manually: ' + val : '复制失败，请手动复制：' + val;
+    });
   });
 });
 
-/* ---------- 导航栏滚动模糊 ---------- */
+/* ---------- 移动端导航 ---------- */
 const nav = document.getElementById('nav');
 const navToggle = document.getElementById('navToggle');
 const navLinks = document.getElementById('navLinks');
-addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40));
+const viewSections = document.querySelectorAll('.lab-section[id]');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', window.scrollY > 40));
 
 function setMobileNav(open) {
   navToggle?.classList.toggle('is-open', open);
   navLinks?.classList.toggle('is-open', open);
   navToggle?.setAttribute('aria-expanded', String(open));
-  navToggle?.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+  navToggle?.setAttribute('aria-label', open ? translateLabel('关闭导航菜单') : translateLabel('打开导航菜单'));
 }
 
 navToggle?.addEventListener('click', event => {
@@ -923,6 +922,48 @@ navToggle?.addEventListener('click', event => {
 
 navLinks?.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => setMobileNav(false));
+});
+
+function activateView(sectionId, pushState = true) {
+  const id = sectionId || 'hero';
+  const target = document.getElementById(id);
+  if (!target?.classList.contains('lab-section')) return false;
+
+  labShell?.setAttribute('data-view-mode', 'single');
+  viewSections.forEach(section => {
+    section.classList.toggle('is-view-active', section === target);
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    const linkId = link.getAttribute('href')?.slice(1);
+    link.classList.toggle('is-active', linkId === id);
+  });
+
+  if (workReader && !workReader.hidden) closeManual();
+  setMobileNav(false);
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+  if (pushState) {
+    const clean = `${window.location.pathname}${window.location.search}#${id}`;
+    window.history.replaceState(null, '', clean);
+  }
+
+  return true;
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', event => {
+    const id = link.getAttribute('href')?.slice(1);
+    if (activateView(id, true)) event.preventDefault();
+  });
+});
+
+if (window.location.hash) {
+  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+}
+
+window.addEventListener('hashchange', () => {
+  activateView(window.location.hash.slice(1) || 'hero', false);
 });
 
 document.addEventListener('click', event => {
@@ -935,14 +976,28 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape') setMobileNav(false);
 });
 
+applyLanguage(readPreference(LANG_KEY, 'zh'));
+activateView('hero', false);
+
+/* ---------- 入场动效：Digital Lab Boot ---------- */
+const bootOverlay = document.getElementById('glitchOverlay');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finishBoot = () => {
+  document.body.classList.remove('is-booting');
+  if (bootOverlay) bootOverlay.style.display = 'none';
+};
+
+if (prefersReducedMotion) {
+  finishBoot();
+} else {
+  window.setTimeout(() => {
+    document.body.classList.remove('is-booting');
+  }, 1460);
+  window.setTimeout(finishBoot, 1950);
+}
+
 /* ---------- 背景视频加载兜底 ---------- */
 const bgVideo = document.getElementById('bgVideo');
 bgVideo?.addEventListener('error', () => {
   bgVideo.classList.add('is-unavailable');
 });
-
-/* ---------- 故障转场兜底移除 ---------- */
-setTimeout(() => {
-  const overlay = document.getElementById('glitchOverlay');
-  if (overlay) overlay.style.display = 'none';
-}, 2400);

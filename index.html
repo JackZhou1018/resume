@@ -5,25 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="周猛 Jack Zhou，FAE 工程师，AI 算力技术支持，聚焦 GPU 服务器、国产化适配、大模型训推、集群交付与客户 POC。">
 <title>周猛 Jack Zhou · FAE 工程师 · AI 算力技术支持</title>
-<link href="https://db.onlinewebfonts.com/c/13ab13418f633c1b0516fed6e30bedbc?family=Suisse+Int%27l" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260830-core1">
 </head>
-<body>
+<body class="is-booting">
 
-<div class="glitch-overlay" id="glitchOverlay">
-  <div class="glitch-text" data-text="JACK ZHOU">JACK ZHOU</div>
-  <div class="glitch-sub">AI COMPUTE FAE // PROFILE ONLINE</div>
+<div class="glitch-overlay boot-overlay" id="glitchOverlay" aria-hidden="true">
+  <div class="boot-grid"></div>
+  <div class="boot-panel">
+    <div class="boot-topline">
+      <span>JACK.ZHOU/LAB</span>
+      <span>BOOT SEQUENCE</span>
+    </div>
+    <div class="boot-mark" data-text="JACK ZHOU">JACK ZHOU</div>
+    <div class="boot-logs">
+      <span>&gt; loading profile modules...</span>
+      <span>&gt; AI COMPUTE FAE: ONLINE</span>
+      <span>&gt; GPU POC / CLUSTER DELIVERY READY</span>
+    </div>
+    <div class="boot-progress"><i></i></div>
+    <div class="boot-status">PROFILE ONLINE</div>
+  </div>
+  <div class="boot-scan"></div>
 </div>
 
 <video class="bg-video" id="bgVideo" autoplay muted loop playsinline preload="metadata">
   <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260813_092641_de52eb87-daf2-41db-92cb-7a56eae012a5.mp4" type="video/mp4">
   <source src="bg.mp4" type="video/mp4">
 </video>
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+<div class="cursor-aura" id="cursorAura" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 
-<canvas id="bgCanvas"></canvas>
-
-<nav class="nav" id="nav">
-  <div class="nav-logo">&gt;_ JACK.ZHOU<span class="cursor">▊</span></div>
+<nav class="nav" id="nav" aria-label="主导航">
+  <a class="nav-logo" href="#hero" aria-label="返回首页">
+    <span class="prompt">&gt;_</span> JACK.ZHOU<span class="muted">/LAB</span><span class="cursor">▊</span>
+  </a>
+  <div class="nav-actions" aria-label="页面工具">
+    <div class="theme-picker" id="themePicker">
+      <button class="tool-toggle" id="paletteToggle" type="button" aria-label="选择强调色" title="选择强调色" aria-controls="paletteMenu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a9 9 0 0 0 0 18h1.4a1.7 1.7 0 0 0 .8-3.2 1.7 1.7 0 0 1 .7-3.3h1.3A4.8 4.8 0 0 0 21 9.7C21 6 17 3 12 3Z"></path>
+          <circle cx="7.6" cy="10.2" r="1"></circle>
+          <circle cx="10.6" cy="7.4" r="1"></circle>
+          <circle cx="14.6" cy="7.8" r="1"></circle>
+          <circle cx="16.8" cy="11.2" r="1"></circle>
+        </svg>
+      </button>
+      <div class="palette-menu" id="paletteMenu" role="menu" aria-label="选择主题" hidden>
+        <p class="palette-title">SELECT THEME</p>
+        <button class="palette-option" type="button" role="menuitemradio" data-accent-option="golden" aria-checked="false">
+          <span class="palette-dot palette-dot-golden"></span><span>Golden</span><i></i>
+        </button>
+        <button class="palette-option" type="button" role="menuitemradio" data-accent-option="cyan" aria-checked="false">
+          <span class="palette-dot palette-dot-cyan"></span><span>Cyan</span><i></i>
+        </button>
+        <button class="palette-option" type="button" role="menuitemradio" data-accent-option="purple" aria-checked="false">
+          <span class="palette-dot palette-dot-purple"></span><span>Purple</span><i></i>
+        </button>
+        <button class="palette-option" type="button" role="menuitemradio" data-accent-option="emerald" aria-checked="false">
+          <span class="palette-dot palette-dot-emerald"></span><span>Emerald</span><i></i>
+        </button>
+        <button class="palette-option" type="button" role="menuitemradio" data-accent-option="rose" aria-checked="true">
+          <span class="palette-dot palette-dot-rose"></span><span>Rose</span><i></i>
+        </button>
+      </div>
+    </div>
+    <button class="tool-toggle" id="themeToggle" type="button" aria-label="切换明暗模式" title="切换明暗模式">
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 14.4A7.4 7.4 0 0 1 9.6 4a8.7 8.7 0 1 0 10.4 10.4Z"></path>
+      </svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+      </svg>
+    </button>
+    <button class="tool-toggle lang-toggle" id="languageToggle" type="button" aria-label="切换为英文" title="切换为英文">EN</button>
+  </div>
   <button class="nav-toggle" id="navToggle" type="button" aria-label="打开导航菜单" aria-controls="navLinks" aria-expanded="false">
     <span></span>
     <span></span>
@@ -33,198 +90,558 @@
     <li><a href="#hero">首页</a></li>
     <li><a href="#skills">能力</a></li>
     <li><a href="#aicoding">AI Coding</a></li>
+    <li><a href="#workbench">实验台</a></li>
     <li><a href="#projects">项目</a></li>
     <li><a href="#experience">经历</a></li>
     <li><a href="#contact">联系</a></li>
   </ul>
 </nav>
 
-<header class="hero" id="hero">
-  <div class="hologram">
-    <div class="holo-ring"></div>
-    <button class="holo-avatar digital-human" id="digitalHuman" type="button" aria-label="唤醒 Jack Zhou 3D 数字人语音助手">
-      <canvas id="digitalHumanCanvas" aria-hidden="true"></canvas>
-      <span class="avatar-fallback">周</span>
-      <span class="voice-core" aria-hidden="true"></span>
-    </button>
-    <div class="holo-scan"></div>
-    <div class="voice-bubble" id="voiceBubble" aria-live="polite">
-      <b id="voiceStatus">点击唤醒</b>
-      <span id="voiceTranscript">可问：项目、经历、AI Coding、联系方式</span>
-    </div>
-    <button class="voice-settings-toggle" id="voiceSettingsToggle" type="button" aria-label="打开数字人声音设置" title="声音设置">⚙</button>
-    <div class="voice-settings" id="voiceSettings" hidden>
-      <label>
-        <span>OpenAI TTS 代理地址</span>
-        <input id="openaiTtsEndpoint" type="url" placeholder="https://你的-worker.workers.dev/tts">
-      </label>
-      <label>
-        <span>OpenAI 声线</span>
-        <select id="openaiVoiceSelect">
-          <option value="coral">coral · 清亮女声</option>
-          <option value="nova">nova · 年轻自然</option>
-          <option value="shimmer">shimmer · 柔和明亮</option>
-          <option value="marin">marin · 亲切自然</option>
-          <option value="verse">verse · 温和叙述</option>
-          <option value="alloy">alloy · 中性稳定</option>
-        </select>
-      </label>
-      <label>
-        <span>浏览器备用声线</span>
-        <select id="voiceSelect"></select>
-      </label>
-      <label>
-        <span>语速 <em id="voiceRateValue">0.96</em></span>
-        <input id="voiceRate" type="range" min="0.75" max="1.15" step="0.01" value="0.96">
-      </label>
-      <label>
-        <span>音调 <em id="voicePitchValue">1.00</em></span>
-        <input id="voicePitch" type="range" min="0.80" max="1.20" step="0.01" value="1.00">
-      </label>
-      <div class="voice-settings-actions">
-        <button id="voiceTest" type="button">试听</button>
-        <button id="voiceSave" type="button">保存</button>
-        <button id="voiceReset" type="button">重置</button>
+<main class="lab-shell">
+  <header class="hero lab-section" id="hero">
+    <div class="hero-copy">
+      <div class="compute-core" id="computeCore" tabindex="0" aria-label="AI Compute Core 交互组件，可拖动视角并滚轮缩放">
+        <canvas id="computeCoreCanvas" aria-hidden="true"></canvas>
+        <div class="compute-core-caption"><span class="core-pulse"></span><span id="computeCoreMode">AI COMPUTE CORE // READY</span></div>
+        <div class="compute-core-hint">DRAG · ZOOM · CLICK</div>
+      </div>
+      <div class="status-row">
+        <span class="status-dot"></span>
+        <span>AI Compute FAE / Beijing</span>
+        <span class="status-pill">35-45K</span>
+      </div>
+      <p class="hero-kicker">PERSONAL DIGITAL LAB</p>
+      <h1 class="hero-name" id="typeTarget">Jack Zhou</h1>
+      <p class="hero-desc">
+        近 10 年服务器硬件与 AI 算力技术服务经验，覆盖联想、同方、摩尔线程。长期负责大客户 POC、OEM 适配、GPU 服务器交付、RoCE 组网、故障闭环与跨部门项目推进。
+      </p>
+      <div class="hero-tags" aria-label="核心标签">
+        <span class="tag">GPU 服务器 POC</span>
+        <span class="tag">大模型训推适配</span>
+        <span class="tag">国产化集群交付</span>
+      </div>
+      <div class="hero-cta">
+        <a href="#workbench" class="btn btn-primary">进入 Workbench →</a>
+        <a href="outputs/jack-zhou-resume.pdf" class="btn btn-ghost" target="_blank" rel="noopener" download>下载 PDF 简历 ↓</a>
+        <a href="#contact" class="btn btn-ghost">联系我</a>
       </div>
     </div>
-  </div>
-  <p class="hero-kicker">FAE Engineer · AI Compute · Beijing</p>
-  <h1 class="hero-name" id="typeTarget"></h1>
-  <div class="hero-tags">
-    <span class="tag">GPU 服务器 POC</span>
-    <span class="tag">大模型训推适配</span>
-    <span class="tag">国产化集群交付</span>
-  </div>
-  <p class="hero-desc">
-    近 10 年服务器硬件与 AI 算力技术服务经验，覆盖联想、同方、摩尔线程。长期负责大客户 POC、OEM 适配、GPU 服务器交付、RoCE 组网、故障闭环与跨部门项目推进。
-  </p>
-  <div class="hero-metrics">
-    <div><strong>500+</strong><span>AI 服务器交付</span></div>
-    <div><strong>5+</strong><span>头部客户 POC</span></div>
-    <div><strong>40万+</strong><span>GPU 图形卡订单</span></div>
-    <div><strong>50+</strong><span>展会 Demo 支持</span></div>
-  </div>
-  <div class="hero-cta">
-    <a href="#projects" class="btn btn-primary">查看项目战绩 →</a>
-    <a href="outputs/jack-zhou-resume.pdf" class="btn btn-ghost" target="_blank" rel="noopener" download>下载 PDF 简历 ↓</a>
-    <a href="#contact" class="btn btn-ghost">联系我</a>
-  </div>
-</header>
 
-<section class="section profile-section" id="profile">
-  <h2 class="section-title"><span class="glitch-h">个人定位</span><span class="section-en">// PROFILE</span></h2>
-  <div class="summary-panel">
-    <p>
-      我更偏现场攻坚型 FAE：能把客户需求翻译成可执行测试项，也能落到服务器、驱动、系统、网络、模型适配和批量交付细节。核心优势是把售前 POC、技术验证、交付上线、问题闭环和项目复盘串成一条完整链路。
-    </p>
-    <div class="summary-grid">
-      <span>北京</span>
-      <span>FAE 工程师</span>
-      <span>AI 算力技术支持</span>
-      <span>期望 35-45K</span>
-    </div>
-  </div>
-</section>
+    <aside class="hero-console" aria-label="简历工作台摘要">
+      <div class="console-head">
+        <span>terminal://jackzhou/profile</span>
+        <i>ONLINE</i>
+      </div>
+      <div class="identity-card">
+        <img src="assets/profile-photo.png" alt="周猛证件照">
+        <div>
+          <span>Identity</span>
+          <strong>周猛 / Jack Zhou</strong>
+          <p>男 · 32 · 北京 · 社招</p>
+        </div>
+      </div>
+      <div class="console-grid">
+        <div class="console-card wide">
+          <span>Current Focus</span>
+          <strong>AI 算力现场攻坚 / FAE 交付</strong>
+          <p>把客户需求翻译成测试项、交付流程、上线标准和可复用 SOP。</p>
+        </div>
+        <div class="console-card"><strong>500+</strong><span>AI 服务器交付</span></div>
+        <div class="console-card"><strong>5+</strong><span>头部客户 POC</span></div>
+        <div class="console-card"><strong>40万+</strong><span>GPU 图形卡订单</span></div>
+        <div class="console-card"><strong>50+</strong><span>展会 Demo 支持</span></div>
+      </div>
+      <div class="terminal-panel mini-terminal">
+        <div class="terminal-top"><span>jackzhou@lab</span><i>resume --status</i></div>
+        <pre><code>role: AI Compute FAE
+focus: GPU POC / Cluster Delivery
+mode: onsite problem solver
+pdf: outputs/jack-zhou-resume.pdf</code></pre>
+      </div>
+    </aside>
+  </header>
 
-<section class="section" id="skills">
-  <h2 class="section-title"><span class="glitch-h">能力矩阵</span><span class="section-en">// CAPABILITY MATRIX</span></h2>
-  <div class="skills-grid">
-    <div class="skill-ring" data-value="96"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>96%</strong><span>GPU POC</span></div></div>
-    <div class="skill-ring" data-value="92"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>92%</strong><span>集群交付</span></div></div>
-    <div class="skill-ring" data-value="90"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>90%</strong><span>硬件测试</span></div></div>
-    <div class="skill-ring" data-value="88"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>88%</strong><span>模型适配</span></div></div>
-    <div class="skill-ring" data-value="86"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg><div class="ring-label"><strong>86%</strong><span>RoCE/信创</span></div></div>
-  </div>
-  <div class="chip-grid">
-    <span>麒麟 / Ubuntu / Linux</span>
-    <span>MUSA / GPU 驱动</span>
-    <span>RoCE 网络</span>
-    <span>BIOS / BMC / IPMI</span>
-    <span>RMA 故障闭环</span>
-    <span>AI 辅助脚本与工具化</span>
-  </div>
-</section>
+  <section class="lab-section profile-section" id="profile">
+    <div class="section-head">
+      <span class="section-index">00</span>
+      <div>
+        <p class="section-en">// PROFILE BRIEF</p>
+        <h2 class="section-title">现场攻坚型 FAE</h2>
+      </div>
+    </div>
+    <div class="brief-grid">
+      <article class="brief-main">
+        <h3>定位</h3>
+        <p>
+          以原始 PDF 简历为内容源：聚焦 GPU 服务器 / 加速卡 POC 验证、主流大模型适配、集群部署与故障闭环，覆盖从客户需求对接、方案设计、POC 验证到订单落地和量产交付的完整技术链路。
+        </p>
+      </article>
+      <article class="brief-card"><span>Location</span><strong>北京</strong></article>
+      <article class="brief-card"><span>Role</span><strong>FAE 工程师</strong></article>
+      <article class="brief-card"><span>Intent</span><strong>35-45K · 社招</strong></article>
+    </div>
+    <div class="advantage-grid">
+      <article>
+        <span>ADV-01</span>
+        <h3>AI 算力全栈技术闭环</h3>
+        <p>精通 GPU 服务器 / 加速卡 POC 验证、主流大模型适配、集群部署与故障闭环，覆盖从选型到量产的完整技术链路。</p>
+      </article>
+      <article>
+        <span>ADV-02</span>
+        <h3>多行业头部客户实战沉淀</h3>
+        <p>主导互联网、央国企、金融、工业机器人等多场景标杆项目，具备国产化信创与 AI 平台落地经验。</p>
+      </article>
+      <article>
+        <span>ADV-03</span>
+        <h3>售前到量产全流程交付</h3>
+        <p>兼具方案设计、现场攻坚、跨部门协同与批量交付管理能力，可独立推进 POC 到订单落地。</p>
+      </article>
+      <article>
+        <span>ADV-04</span>
+        <h3>标准化与长期价值沉淀</h3>
+        <p>擅长将项目经验转化为可复用适配流程、测试规范与上线标准，为规模化部署提供稳定支撑。</p>
+      </article>
+    </div>
+  </section>
 
-<section class="section ai-section" id="aicoding">
-  <h2 class="section-title"><span class="glitch-h">AI Coding 作品集</span><span class="section-en">// AI NATIVE ENGINEERING</span></h2>
-  <div class="ai-hero-panel">
-    <div>
-      <p class="ai-eyebrow">Vibe Coding / Prompt Engineering / Automation</p>
-      <h3>把 FAE 现场重复劳动快速工具化</h3>
-      <p>
-        熟练使用自然语言驱动的 AI 辅助编程，把 GPU 环境检测、集群巡检、测试脚本生成、故障诊断、数据看板和产品资料制作变成可复用工具。我的价值不是“会写 demo”，而是能把现场经验转成工程化 SOP 和可交付产物。
-      </p>
+  <section class="lab-section" id="skills">
+    <div class="section-head">
+      <span class="section-index">01</span>
+      <div>
+        <p class="section-en">// SYSTEMS</p>
+        <h2 class="section-title">能力系统</h2>
+      </div>
     </div>
-    <div class="ai-stats">
-      <span><strong>25+</strong>运维脚本沉淀</span>
-      <span><strong>43</strong>项集群检查</span>
-      <span><strong>2</strong>套推理部署手册</span>
-      <span><strong>3D</strong>可视化交付</span>
+    <div class="systems-grid">
+      <article class="system-card">
+        <div class="system-top"><span>SYS-01</span><em>96%</em></div>
+        <h3>GPU POC 与客户验证</h3>
+        <p>测试环境搭建、用例设计、基准准入、模型训推适配、结果复盘和客户选型闭环。</p>
+      </article>
+      <article class="system-card">
+        <div class="system-top"><span>SYS-02</span><em>92%</em></div>
+        <h3>AI 集群交付</h3>
+        <p>机房从 0 搭建、硬件开箱验货、系统安装、GPU 驱动、RoCE 组网、基础测试和验收支持。</p>
+      </article>
+      <article class="system-card">
+        <div class="system-top"><span>SYS-03</span><em>90%</em></div>
+        <h3>硬件测试与故障闭环</h3>
+        <p>CPU、内存、存储、背板、BIOS/BMC、网络压测、多系统兼容、可靠性测试和 RMA 闭环。</p>
+      </article>
+      <article class="system-card">
+        <div class="system-top"><span>SYS-04</span><em>88%</em></div>
+        <h3>大模型部署适配</h3>
+        <p>Llama3、DeepSeek、GLM、Qwen、WAN 等模型训练/推理适配、接口验证、日志定位和 SOP 沉淀。</p>
+      </article>
     </div>
-  </div>
-  <div class="works-grid">
-    <article class="work-card">
-      <div class="work-head"><span>KIMI3</span><em>Python / 集群巡检</em></div>
-      <h3>KIMI3 集群节点巡检工具</h3>
-      <p>面向 8 节点 MUSA/GPU 集群的“起飞门禁”巡检：单入口完成宿主机取证、MUSA/通信检查、门禁判定、离线 HTML 报告、证据包与节点隔离建议。</p>
-      <div class="work-tags"><span>8 节点</span><span>43 项检查</span><span>GO/NO-GO</span></div>
-    </article>
-    <article class="work-card">
-      <div class="work-head"><span>LOG</span><em>Bash / 故障取证</em></div>
-      <h3>服务器故障日志一键收集</h3>
-      <p>S5000 服务器故障现场一键取证：系统信息、dmesg、journalctl、GPU 状态、驱动模块、GCD 错误转存、容器与网络日志自动采集打包。</p>
-      <div class="work-tags"><span>8+ 类证据</span><span>一键打包</span><span>故障定位</span></div>
-    </article>
-    <article class="work-card">
-      <div class="work-head"><span>OPS</span><em>Shell / SOP 沉淀</em></div>
-      <h3>GPU 集群运维脚本集</h3>
-      <p>25+ 个可复用集群运维脚本，cluster_ops.sh 统一入口：巡检、SSH 全互信、hostname 治理、yum/dkms 修复、SDK 同步、模型下载监控与 RoCE/IB 诊断。</p>
-      <div class="work-tags"><span>25+ 脚本</span><span>统一入口</span><span>dry-run</span></div>
-    </article>
-    <article class="work-card work-card-portal" data-manual="market" data-work-url="https://jackzhou1018.github.io/-/" tabindex="0" role="button" aria-label="打开每日盯盘 3D Market Deck">
-      <div class="work-head"><span>MARKET</span><em>Web / 3D 可视化</em></div>
-      <h3>每日盯盘 · 3D Market Deck</h3>
-      <p>国内盘每日盯盘网页：自动抓取行情并以 3D 可视化呈现，深色科技风实时看板，用自动化替代人工盯盘。</p>
-      <div class="work-tags"><span>实时行情</span><span>3D 可视化</span><span>自动盯盘</span></div>
-      <span class="work-link work-open" data-manual-open="market">点击卡片进入 →</span>
-    </article>
-    <article class="work-card work-card-portal" data-manual="starship" data-work-url="https://jackzhou1018.github.io/Jack_Zhou_resume/starship-v3/index.html" tabindex="0" role="button" aria-label="打开星舰 V3 工程级 3D 交付">
-      <div class="work-head"><span>STARSHIP</span><em>3D / 工程制图</em></div>
-      <h3>星舰 V3 · 工程级 3D 交付</h3>
-      <p>从零完成星舰 V3 参数化 3D 建模、交互式查看器、爆炸图、零件图、装配图与 18 章维修手册，整套由 AI 编程生成并本地自检。</p>
-      <div class="work-tags"><span>124.4m</span><span>12 部件</span><span>18 章手册</span></div>
-      <span class="work-link work-open" data-manual-open="starship">点击卡片进入 →</span>
-    </article>
-    <article class="work-card work-card-portal" data-manual="moore" data-work-url="https://jackzhou1018.github.io/Jack_Zhou_resume/moore-threads/index.html" tabindex="0" role="button" aria-label="打开摩尔线程产品介绍互动演示">
-      <div class="work-head"><span>MTT</span><em>HTML / PPTX</em></div>
-      <h3>摩尔线程产品介绍 · 互动演示</h3>
-      <p>用 AI 编程完成摩尔线程 GPU 产品介绍：28 页 HTML 互动演示与可编辑 PPTX 双版本，覆盖 S5000、万卡集群、软件生态与资本市场资料。</p>
-      <div class="work-tags"><span>28 页</span><span>HTML + PPTX</span><span>S5000 专题</span></div>
-      <span class="work-link work-open" data-manual-open="moore">点击卡片进入 →</span>
-    </article>
-    <article class="work-card work-card-portal" data-manual="jarvis" data-work-url="docs/jarvis-hologram-3d.html" tabindex="0" role="button" aria-label="打开 JARVIS 全息人形 3D 预览">
-      <div class="work-head"><span>JARVIS</span><em>Three.js / 3D 全息</em></div>
-      <h3>JARVIS 全息人形 · 3D Preview</h3>
-      <p>基于 AI 生成参考图，用 Three.js 程序化重建半透明淡蓝白全息人形：胸口核心、环形数据轨道、粒子流、数据雨、冷蓝 Bloom 和可交互旋转视角。</p>
-      <div class="work-tags"><span>Three.js</span><span>全息粒子</span><span>可交互 3D</span></div>
-      <span class="work-link work-open" data-manual-open="jarvis">点击卡片进入 →</span>
-    </article>
-    <article class="work-card work-card-portal" data-manual="deepseek" tabindex="0" role="button" aria-label="打开 DeepSeek V4 Flash PD 分离部署手册">
-      <div class="work-head"><span>DS-V4</span><em>SGLang / PD 分离</em></div>
-      <h3>DeepSeek V4 Flash PD 分离部署手册</h3>
-      <p>将 DeepSeek V4 Flash 在 MUSA/SGLang 环境下的 Prefill、Decode、Router 分离部署流程整理成客户可执行手册，覆盖容器创建、一键拉起、日志定位、OpenAI 兼容接口验证和停服回滚。</p>
-      <div class="work-tags"><span>3P1D + Router</span><span>容器化部署</span><span>客户手册</span></div>
-      <span class="work-link work-open" data-manual-open="deepseek">点击卡片进入 →</span>
-    </article>
-    <article class="work-card work-card-portal" data-manual="glm" tabindex="0" role="button" aria-label="打开 GLM5.2 PD 部署操作手册">
-      <div class="work-head"><span>GLM5.2</span><em>P3D4 / 长上下文</em></div>
-      <h3>GLM5.2 PD 部署操作手册</h3>
-      <p>面向 GLM5.2 FP8 模型的多节点 P/D 分离推理部署，沉淀拓扑说明、容器启动、通用环境变量、Prefill/Decode/Router 脚本、流式问答验证与日志排障路径。</p>
-      <div class="work-tags"><span>P3D4 拓扑</span><span>256K 上下文</span><span>流式验证</span></div>
-      <span class="work-link work-open" data-manual-open="glm">点击卡片进入 →</span>
-    </article>
-  </div>
-</section>
+    <div class="toolchain">
+      <span>麒麟 / Ubuntu / Linux</span>
+      <span>MUSA / GPU 驱动</span>
+      <span>RoCE 网络</span>
+      <span>BIOS / BMC / IPMI</span>
+      <span>RMA 故障闭环</span>
+      <span>AI 辅助脚本与工具化</span>
+    </div>
+  </section>
+
+  <section class="lab-section ai-section" id="aicoding">
+    <div class="section-head">
+      <span class="section-index">02</span>
+      <div>
+        <p class="section-en">// EXPERIMENTS</p>
+        <h2 class="section-title">AI Coding 实验室</h2>
+      </div>
+    </div>
+    <div class="lab-intro">
+      <div>
+        <p class="ai-eyebrow">Vibe Coding / Prompt Engineering / Automation</p>
+        <h3>把 FAE 现场重复劳动快速工具化</h3>
+        <p>熟练使用自然语言驱动的 AI 辅助编程，把 GPU 环境检测、集群巡检、测试脚本生成、故障诊断、数据看板和产品资料制作变成可复用工具。</p>
+      </div>
+      <div class="ai-stats">
+        <span><strong>25+</strong>运维脚本沉淀</span>
+        <span><strong>43</strong>项集群检查</span>
+        <span><strong>2</strong>套推理部署手册</span>
+        <span><strong>3D</strong>可视化交付</span>
+      </div>
+    </div>
+    <div class="filter-bar" role="list" aria-label="作品筛选">
+      <button class="filter-chip is-active" type="button" data-work-filter="all">All</button>
+      <button class="filter-chip" type="button" data-work-filter="ops">Ops</button>
+      <button class="filter-chip" type="button" data-work-filter="deploy">Deploy</button>
+      <button class="filter-chip" type="button" data-work-filter="visual">Visual</button>
+      <button class="filter-chip" type="button" data-work-filter="docs">Docs</button>
+    </div>
+    <div class="works-grid">
+      <article class="work-card" data-work-kind="ops">
+        <div class="work-head"><span>KIMI3</span><em>Python / 集群巡检</em></div>
+        <h3>KIMI3 集群节点巡检工具</h3>
+        <p>面向 8 节点 MUSA/GPU 集群的“起飞门禁”巡检：单入口完成宿主机取证、MUSA/通信检查、门禁判定、离线 HTML 报告、证据包与节点隔离建议。</p>
+        <div class="work-tags"><span>8 节点</span><span>43 项检查</span><span>GO/NO-GO</span></div>
+      </article>
+      <article class="work-card" data-work-kind="ops">
+        <div class="work-head"><span>LOG</span><em>Bash / 故障取证</em></div>
+        <h3>服务器故障日志一键收集</h3>
+        <p>S5000 服务器故障现场一键取证：系统信息、dmesg、journalctl、GPU 状态、驱动模块、GCD 错误转存、容器与网络日志自动采集打包。</p>
+        <div class="work-tags"><span>8+ 类证据</span><span>一键打包</span><span>故障定位</span></div>
+      </article>
+      <article class="work-card" data-work-kind="ops">
+        <div class="work-head"><span>OPS</span><em>Shell / SOP 沉淀</em></div>
+        <h3>GPU 集群运维脚本集</h3>
+        <p>25+ 个可复用集群运维脚本，cluster_ops.sh 统一入口：巡检、SSH 全互信、hostname 治理、yum/dkms 修复、SDK 同步、模型下载监控与 RoCE/IB 诊断。</p>
+        <div class="work-tags"><span>25+ 脚本</span><span>统一入口</span><span>dry-run</span></div>
+      </article>
+      <article class="work-card work-card-portal" data-work-kind="visual" data-manual="market" data-work-url="https://jackzhou1018.github.io/-/" tabindex="0" role="button" aria-label="打开每日盯盘 3D Market Deck">
+        <div class="work-head"><span>MARKET</span><em>Web / 3D 可视化</em></div>
+        <h3>每日盯盘 · 3D Market Deck</h3>
+        <p>国内盘每日盯盘网页：自动抓取行情并以 3D 可视化呈现，深色科技风实时看板，用自动化替代人工盯盘。</p>
+        <div class="work-tags"><span>实时行情</span><span>3D 可视化</span><span>自动盯盘</span></div>
+        <div class="work-actions" aria-label="作品链接">
+          <a class="work-action work-source" href="https://github.com/jackzhou1018/resume" target="_blank" rel="noreferrer" aria-label="查看源码">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.4-.4 7-1.7 7-7.6a5.9 5.9 0 0 0-1.6-4.1 5.5 5.5 0 0 0-.1-4.1s-1.3-.4-4.2 1.6a14.4 14.4 0 0 0-7.6 0C5.6.3 4.3.7 4.3.7a5.5 5.5 0 0 0-.1 4.1A5.9 5.9 0 0 0 2.6 8.9c0 5.9 3.6 7.2 7 7.6a3 3 0 0 0-.9 2.1V22"></path></svg>
+            <span>source</span>
+          </a>
+          <span class="work-action work-open" data-manual-open="market" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path><path d="M14 5h5v5M19 14v5H5V5h5"></path></svg>
+            <span>live</span>
+          </span>
+        </div>
+      </article>
+      <article class="work-card work-card-portal" data-work-kind="visual" data-manual="starship" data-work-url="https://jackzhou1018.github.io/Jack_Zhou_resume/starship-v3/index.html" tabindex="0" role="button" aria-label="打开星舰 V3 工程级 3D 交付">
+        <div class="work-head"><span>STARSHIP</span><em>3D / 工程制图</em></div>
+        <h3>星舰 V3 · 工程级 3D 交付</h3>
+        <p>从零完成星舰 V3 参数化 3D 建模、交互式查看器、爆炸图、零件图、装配图与 18 章维修手册，整套由 AI 编程生成并本地自检。</p>
+        <div class="work-tags"><span>124.4m</span><span>12 部件</span><span>18 章手册</span></div>
+        <div class="work-actions" aria-label="作品链接">
+          <a class="work-action work-source" href="https://github.com/jackzhou1018/resume" target="_blank" rel="noreferrer" aria-label="查看源码">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.4-.4 7-1.7 7-7.6a5.9 5.9 0 0 0-1.6-4.1 5.5 5.5 0 0 0-.1-4.1s-1.3-.4-4.2 1.6a14.4 14.4 0 0 0-7.6 0C5.6.3 4.3.7 4.3.7a5.5 5.5 0 0 0-.1 4.1A5.9 5.9 0 0 0 2.6 8.9c0 5.9 3.6 7.2 7 7.6a3 3 0 0 0-.9 2.1V22"></path></svg>
+            <span>source</span>
+          </a>
+          <span class="work-action work-open" data-manual-open="starship" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path><path d="M14 5h5v5M19 14v5H5V5h5"></path></svg>
+            <span>live</span>
+          </span>
+        </div>
+      </article>
+      <article class="work-card work-card-portal" data-work-kind="docs" data-manual="moore" data-work-url="https://jackzhou1018.github.io/Jack_Zhou_resume/moore-threads/index.html" tabindex="0" role="button" aria-label="打开摩尔线程产品介绍互动演示">
+        <div class="work-head"><span>MTT</span><em>HTML / PPTX</em></div>
+        <h3>摩尔线程产品介绍 · 互动演示</h3>
+        <p>用 AI 编程完成摩尔线程 GPU 产品介绍：28 页 HTML 互动演示与可编辑 PPTX 双版本，覆盖 S5000、万卡集群、软件生态与资本市场资料。</p>
+        <div class="work-tags"><span>28 页</span><span>HTML + PPTX</span><span>S5000 专题</span></div>
+        <div class="work-actions" aria-label="作品链接">
+          <a class="work-action work-source" href="https://github.com/jackzhou1018/resume" target="_blank" rel="noreferrer" aria-label="查看源码">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.4-.4 7-1.7 7-7.6a5.9 5.9 0 0 0-1.6-4.1 5.5 5.5 0 0 0-.1-4.1s-1.3-.4-4.2 1.6a14.4 14.4 0 0 0-7.6 0C5.6.3 4.3.7 4.3.7a5.5 5.5 0 0 0-.1 4.1A5.9 5.9 0 0 0 2.6 8.9c0 5.9 3.6 7.2 7 7.6a3 3 0 0 0-.9 2.1V22"></path></svg>
+            <span>source</span>
+          </a>
+          <span class="work-action work-open" data-manual-open="moore" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path><path d="M14 5h5v5M19 14v5H5V5h5"></path></svg>
+            <span>live</span>
+          </span>
+        </div>
+      </article>
+      <article class="work-card work-card-portal" data-work-kind="visual" data-manual="jarvis" data-work-url="docs/jarvis-hologram-3d.html" tabindex="0" role="button" aria-label="打开 JARVIS 全息人形 3D 预览">
+        <div class="work-head"><span>JARVIS</span><em>Three.js / 3D 全息</em></div>
+        <h3>JARVIS 全息人形 · 3D Preview</h3>
+        <p>基于 AI 生成参考图，用 Three.js 程序化重建半透明淡蓝白全息人形：胸口核心、环形数据轨道、粒子流、数据雨、冷蓝 Bloom 和可交互旋转视角。</p>
+        <div class="work-tags"><span>Three.js</span><span>全息粒子</span><span>可交互 3D</span></div>
+        <div class="work-actions" aria-label="作品链接">
+          <a class="work-action work-source" href="https://github.com/jackzhou1018/resume" target="_blank" rel="noreferrer" aria-label="查看源码">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.4-.4 7-1.7 7-7.6a5.9 5.9 0 0 0-1.6-4.1 5.5 5.5 0 0 0-.1-4.1s-1.3-.4-4.2 1.6a14.4 14.4 0 0 0-7.6 0C5.6.3 4.3.7 4.3.7a5.5 5.5 0 0 0-.1 4.1A5.9 5.9 0 0 0 2.6 8.9c0 5.9 3.6 7.2 7 7.6a3 3 0 0 0-.9 2.1V22"></path></svg>
+            <span>source</span>
+          </a>
+          <span class="work-action work-open" data-manual-open="jarvis" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path><path d="M14 5h5v5M19 14v5H5V5h5"></path></svg>
+            <span>live</span>
+          </span>
+        </div>
+      </article>
+      <article class="work-card work-card-portal" data-work-kind="deploy" data-manual="deepseek" tabindex="0" role="button" aria-label="打开 DeepSeek V4 Flash PD 分离部署手册">
+        <div class="work-head"><span>DS-V4</span><em>SGLang / PD 分离</em></div>
+        <h3>DeepSeek V4 Flash PD 分离部署手册</h3>
+        <p>将 DeepSeek V4 Flash 在 MUSA/SGLang 环境下的 Prefill、Decode、Router 分离部署流程整理成客户可执行手册，覆盖容器创建、一键拉起、日志定位、OpenAI 兼容接口验证和停服回滚。</p>
+        <div class="work-tags"><span>3P1D + Router</span><span>容器化部署</span><span>客户手册</span></div>
+        <div class="work-actions" aria-label="作品链接">
+          <a class="work-action work-source" href="https://github.com/jackzhou1018/resume" target="_blank" rel="noreferrer" aria-label="查看源码">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.4-.4 7-1.7 7-7.6a5.9 5.9 0 0 0-1.6-4.1 5.5 5.5 0 0 0-.1-4.1s-1.3-.4-4.2 1.6a14.4 14.4 0 0 0-7.6 0C5.6.3 4.3.7 4.3.7a5.5 5.5 0 0 0-.1 4.1A5.9 5.9 0 0 0 2.6 8.9c0 5.9 3.6 7.2 7 7.6a3 3 0 0 0-.9 2.1V22"></path></svg>
+            <span>source</span>
+          </a>
+          <span class="work-action work-open" data-manual-open="deepseek" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path><path d="M14 5h5v5M19 14v5H5V5h5"></path></svg>
+            <span>live</span>
+          </span>
+        </div>
+      </article>
+      <article class="work-card work-card-portal" data-work-kind="deploy" data-manual="glm" tabindex="0" role="button" aria-label="打开 GLM5.2 PD 部署操作手册">
+        <div class="work-head"><span>GLM5.2</span><em>P3D4 / 长上下文</em></div>
+        <h3>GLM5.2 PD 部署操作手册</h3>
+        <p>面向 GLM5.2 FP8 模型的多节点 P/D 分离推理部署，沉淀拓扑说明、容器启动、通用环境变量、Prefill/Decode/Router 脚本、流式问答验证与日志排障路径。</p>
+        <div class="work-tags"><span>P3D4 拓扑</span><span>256K 上下文</span><span>流式验证</span></div>
+        <div class="work-actions" aria-label="作品链接">
+          <a class="work-action work-source" href="https://github.com/jackzhou1018/resume" target="_blank" rel="noreferrer" aria-label="查看源码">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.4-.4 7-1.7 7-7.6a5.9 5.9 0 0 0-1.6-4.1 5.5 5.5 0 0 0-.1-4.1s-1.3-.4-4.2 1.6a14.4 14.4 0 0 0-7.6 0C5.6.3 4.3.7 4.3.7a5.5 5.5 0 0 0-.1 4.1A5.9 5.9 0 0 0 2.6 8.9c0 5.9 3.6 7.2 7 7.6a3 3 0 0 0-.9 2.1V22"></path></svg>
+            <span>source</span>
+          </a>
+          <span class="work-action work-open" data-manual-open="glm" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path><path d="M14 5h5v5M19 14v5H5V5h5"></path></svg>
+            <span>live</span>
+          </span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" id="workbench">
+    <div class="section-head">
+      <span class="section-index">03</span>
+      <div>
+        <p class="section-en">// WORKBENCH</p>
+        <h2 class="section-title">实验台与交付记录</h2>
+      </div>
+    </div>
+    <div class="workbench-grid">
+      <aside class="bench-tabs" role="tablist" aria-label="实验台标签">
+        <button class="bench-tab is-active" type="button" role="tab" aria-selected="true" data-bench-tab="delivery">交付链路</button>
+        <button class="bench-tab" type="button" role="tab" aria-selected="false" data-bench-tab="automation">自动化沉淀</button>
+        <button class="bench-tab" type="button" role="tab" aria-selected="false" data-bench-tab="docs">文档化输出</button>
+      </aside>
+      <div class="bench-panels">
+        <article class="bench-panel is-active" data-bench-panel="delivery">
+          <span class="lab-status">ACTIVE</span>
+          <h3>从 POC 到批量交付</h3>
+          <p>覆盖需求拆解、测试计划、服务器环境、GPU 驱动、RoCE 组网、模型验证、验收和问题闭环。</p>
+          <ol>
+            <li>客户需求 → 可执行测试项</li>
+            <li>POC 现场 → 数据和问题闭环</li>
+            <li>项目交付 → SOP 与复盘沉淀</li>
+          </ol>
+        </article>
+        <article class="bench-panel" data-bench-panel="automation">
+          <span class="lab-status">BUILDING</span>
+          <h3>把现场经验变成工具</h3>
+          <p>用 AI Coding 把巡检、日志采集、部署脚本、产品资料和可视化页面沉淀为可复用资产。</p>
+          <ol>
+            <li>脚本统一入口与 dry-run</li>
+            <li>故障证据自动打包</li>
+            <li>交付页面和报告自动生成</li>
+          </ol>
+        </article>
+        <article class="bench-panel" data-bench-panel="docs">
+          <span class="lab-status">SHIPPING</span>
+          <h3>客户可执行文档</h3>
+          <p>把复杂部署流程写成客户能照着做的操作手册，减少现场沟通成本，并便于售后复用。</p>
+          <ol>
+            <li>拓扑说明与启动顺序</li>
+            <li>接口验证与日志路径</li>
+            <li>异常处理和回滚步骤</li>
+          </ol>
+        </article>
+      </div>
+      <aside class="terminal-panel" aria-label="当前终端摘要">
+        <div class="terminal-top"><span>jackzhou@lab</span><i>cat current-focus.log</i></div>
+        <pre><code>01  translate customer requirement
+02  validate server / driver / model
+03  close issue with evidence
+04  ship SOP and reusable tooling</code></pre>
+      </aside>
+    </div>
+  </section>
+
+  <section class="lab-section" id="projects">
+    <div class="section-head">
+      <span class="section-index">04</span>
+      <div>
+        <p class="section-en">// PROJECT MATRIX</p>
+        <h2 class="section-title">代表项目</h2>
+      </div>
+    </div>
+    <div class="filter-bar" role="list" aria-label="项目筛选">
+      <button class="project-filter is-active" type="button" data-project-filter="all">All</button>
+      <button class="project-filter" type="button" data-project-filter="ai-server">AI Server</button>
+      <button class="project-filter" type="button" data-project-filter="poc">POC</button>
+      <button class="project-filter" type="button" data-project-filter="xinchuang">信创</button>
+      <button class="project-filter" type="button" data-project-filter="robotics">机器人</button>
+      <button class="project-filter" type="button" data-project-filter="demo">Demo</button>
+    </div>
+    <div class="projects-grid">
+      <article class="proj-card tilt" data-project-kind="ai-server poc">
+        <div class="proj-bg">JD</div>
+        <div class="proj-body">
+          <span class="lab-status">2026.06 至今 · 云/零售</span>
+          <h3>京东云及零售 GPU 服务器项目</h3>
+          <p>主导 POC、送测准入、基准验证、大模型训推适配，负责 500+ 台 AI 服务器批量交付。</p>
+        </div>
+        <div class="proj-overlay"><span>FAE 技术支持</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="ai-server poc">
+        <div class="proj-bg">MT</div>
+        <div class="proj-body">
+          <span class="lab-status">2025.10 至今 · 互联网</span>
+          <h3>美团互联网客户 POC</h3>
+          <p>覆盖 Llama3 训练、DeepSeek 671B 双机推理、AI 平台和搜广推模型适配，客户满意度 98%。</p>
+        </div>
+        <div class="proj-overlay"><span>年度算力集采中标</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="ai-server poc">
+        <div class="proj-bg">KS</div>
+        <div class="proj-body">
+          <span class="lab-status">2025.04 至今 · POC 负责人</span>
+          <h3>快手 GPU 板卡/服务器 POC</h3>
+          <p>统筹送测准入、整机联调、功耗温控基线、大模型训练/推理适配，输出上线校验标准。</p>
+        </div>
+        <div class="proj-overlay"><span>客户选型验收通过</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="ai-server poc">
+        <div class="proj-bg">CETC</div>
+        <div class="proj-body">
+          <span class="lab-status">2025.10 至今 · 央国企</span>
+          <h3>中电科智能院 AI 算力集群</h3>
+          <p>技术评分第一中标，完成 Qwen、DeepSeek-R1、WAN、GLM 等 9 款主流大模型适配调优。</p>
+        </div>
+        <div class="proj-overlay"><span>集群交付</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="xinchuang">
+        <div class="proj-bg">10W</div>
+        <div class="proj-body">
+          <span class="lab-status">2022.03-2022.09 · 金融</span>
+          <h3>邮储银行 GPU 图形卡集采</h3>
+          <p>协助信创 GPU 产品需求调研、兼容性测试与投标材料筹备，支撑 10 万张订单落地。</p>
+        </div>
+        <div class="proj-overlay"><span>信创适配</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="xinchuang">
+        <div class="proj-bg">30W</div>
+        <div class="proj-body">
+          <span class="lab-status">2023.02-2024.11 · 金融/运营商</span>
+          <h3>工行/移动终端集采</h3>
+          <p>自研 GPU 图形卡终端场景适配验证与问题排查，通过集采技术资质审核，约 30 万张订单。</p>
+        </div>
+        <div class="proj-overlay"><span>技术资质审核</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="robotics ai-server">
+        <div class="proj-bg">SOC</div>
+        <div class="proj-body">
+          <span class="lab-status">2024.02-2024.10 · 工业机器人</span>
+          <h3>东土科技工业机器人项目</h3>
+          <p>协助对接 ODM 与工业自动化合作伙伴，推进摩尔线程自研高算力 SOC 芯片与工业机器人场景的软硬件适配、采购需求梳理和落地交付。</p>
+        </div>
+        <div class="proj-overlay"><span>1 款工业机器人适配验证</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="xinchuang">
+        <div class="proj-bg">BIM</div>
+        <div class="proj-body">
+          <span class="lab-status">2025.12 至今 · 建筑设计</span>
+          <h3>雅江集团建研院国产图形工作站项目</h3>
+          <p>主导项目统筹，携手紫光计算机拉通需求、方案、测试链路，设计国产化图形工作站方案和多场景测试验证体系。</p>
+        </div>
+        <div class="proj-overlay"><span>预计 3D 建模效率提升 90%</span></div>
+      </article>
+      <article class="proj-card tilt" data-project-kind="demo ai-server">
+        <div class="proj-bg">50+</div>
+        <div class="proj-body">
+          <span class="lab-status">2021.12 至今 · 产品支持</span>
+          <h3>公司大型展会产品支持</h3>
+          <p>负责新品发布会、MDC 2025 医疗板块、紫光销售大会、WAIC、中移动装备供应链大会等展会 Demo 部署与现场讲解。</p>
+        </div>
+        <div class="proj-overlay"><span>50+ 讲解 / 30+ 意向线索</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" id="experience">
+    <div class="section-head">
+      <span class="section-index">05</span>
+      <div>
+        <p class="section-en">// CAREER LOGS</p>
+        <h2 class="section-title">工作经历</h2>
+      </div>
+    </div>
+    <div class="timeline">
+      <article class="timeline-item">
+        <div class="timeline-date">2021.11 - 至今</div>
+        <div class="timeline-card">
+          <h3>摩尔线程智能科技（北京）股份有限公司</h3>
+          <p class="timeline-role">FAE · 人工智能硬件</p>
+          <ul>
+            <li>负责 AI GPU 产品全生命周期技术服务，覆盖大客户 POC、OEM 适配、服务器交付与故障闭环。</li>
+            <li>聚焦互联网、央国企等头部客户 AI GPU 服务器场景，提供整机基础测试、模型训推测试方案制定与执行。</li>
+            <li>累计支持 5+ 个 POC 项目，推进 3 家头部 OEM 客户量产，支撑 10+ 个 OEM 大型项目落地。</li>
+            <li>主导大客户 GPU 服务器交付：机房搭建、硬件验货、系统安装、GPU 驱动部署、RoCE 组网、基础测试和交付验收。</li>
+            <li>负责 GPU RMA 流程全管控，接收客户故障反馈，协调内部资源完成检测、分析、定位和解决方案落地。</li>
+          </ul>
+        </div>
+      </article>
+      <article class="timeline-item">
+        <div class="timeline-date">2019.11 - 2021.11</div>
+        <div class="timeline-card">
+          <h3>北京同方信息安全股份有限公司</h3>
+          <p class="timeline-role">测试运维 · 计算机硬件</p>
+          <ul>
+            <li>负责硬件产品测试计划、功能/性能/兼容性验证、故障定位与测试报告输出。</li>
+            <li>联动研发、生产、质量团队处理交付问题，保障产品稳定上线。</li>
+          </ul>
+        </div>
+      </article>
+      <article class="timeline-item">
+        <div class="timeline-date">2017.03 - 2019.11</div>
+        <div class="timeline-card">
+          <h3>联想北京信息技术有限公司</h3>
+          <p class="timeline-role">测试开发 · 计算机硬件</p>
+          <ul>
+            <li>完成 30+ 款服务器硬件测试，覆盖 CPU、内存、存储、背板、BIOS/BMC、系统兼容性与可靠性。</li>
+            <li>开展网卡适配、网络压测、整机高负载稳定性、多操作系统兼容性和高低温、震动、跌落等可靠性测试。</li>
+            <li>熟悉 IPMI、WebUI、远程部署和 Windows、Linux、麒麟等多操作系统测试环境。</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <div class="education-card">
+      <span class="lab-status">EDUCATION</span>
+      <h3>辽宁地质工程职业学院</h3>
+      <p>2012.09 - 2015.06 · 金属矿产地质与勘查技术 · 大专</p>
+    </div>
+  </section>
+
+  <section class="lab-section" id="contact">
+    <div class="section-head">
+      <span class="section-index">06</span>
+      <div>
+        <p class="section-en">// CONTACT TERMINAL</p>
+        <h2 class="section-title">与我联系</h2>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <article class="contact-card">
+        <span class="lab-status">READY</span>
+        <h3>周猛 / Jack Zhou</h3>
+        <p>FAE 工程师 · AI 算力技术支持 · 北京</p>
+        <p class="contact-note">电话和微信号一致；按钮点击后会复制到剪贴板。</p>
+      </article>
+      <div class="contact-row">
+        <button class="contact-btn" data-copy="1428614426@qq.com" title="点击复制邮箱">
+          <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5h18v13H3z"></path><path d="m3.5 6.5 8.5 6 8.5-6"></path></svg>
+          <span>Mail</span>
+        </button>
+        <a class="contact-btn" href="https://github.com/jackzhou1018" target="_blank" rel="noreferrer" title="GitHub">
+          <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19.5c-4 .9-4-2-5.5-2.5M14.5 21v-3.1c0-1 .1-1.4-.5-2 2.8-.3 5.7-1.4 5.7-6.2 0-1.2-.4-2.2-1.1-3 .1-.3.5-1.5-.1-3.1 0 0-.9-.3-3 1.1a10.4 10.4 0 0 0-5.5 0C7.9 7.3 7 7.6 7 7.6c-.6 1.6-.2 2.8-.1 3.1-.7.8-1.1 1.8-1.1 3 0 4.8 2.9 5.9 5.7 6.2-.4.4-.6 1-.6 2.1V21"></path></svg>
+          <span>GitHub</span>
+        </a>
+        <button class="contact-btn" data-copy="17609439323" title="点击复制电话">
+          <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.5 9.8 3l2 4.7-2 1.4a15.2 15.2 0 0 0 5.1 5.1l1.4-2 4.7 2-.5 2.6c-.3 1.5-1.7 2.6-3.2 2.4A15.8 15.8 0 0 1 4.8 7.2C4.6 5.7 5.7 3.8 7.2 3.5Z"></path></svg>
+          <span>Tel</span>
+        </button>
+        <button class="contact-btn" data-copy="17609439323" title="点击复制微信">
+          <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5C4 8.5 7 6 10.7 6s6.7 2.5 6.7 5.5-3 5.5-6.7 5.5c-.8 0-1.6-.1-2.3-.3L5 19l.8-2.4C4.7 15.6 4 13.7 4 11.5Z"></path><path d="M13.4 16.2c.4 2.3 2.8 4 5.6 4 .5 0 1.1-.1 1.5-.2l1.5 1 .1-1.7c.8-.7 1.3-1.7 1.3-2.8 0-2-1.7-3.7-4-4.2"></path><path d="M8 11h.1M13 11h.1M16.5 16.2h.1M20 16.2h.1"></path></svg>
+          <span>WeChat</span>
+        </button>
+        <a class="contact-btn" href="outputs/jack-zhou-resume.pdf" target="_blank" rel="noopener" download>
+          <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.8h8l4 4v14.4H6z"></path><path d="M14 2.8v4h4M8.5 16.5h7M8.5 13h7M8.5 10h2"></path></svg>
+          <span>PDF</span>
+        </a>
+      </div>
+    </div>
+    <p class="contact-tip" id="copyTip"></p>
+  </section>
+</main>
 
 <aside class="work-reader" id="workReader" aria-hidden="true" hidden>
   <div class="reader-tunnel" aria-hidden="true"></div>
@@ -319,117 +736,8 @@
   </div>
 </aside>
 
-<section class="section" id="projects">
-  <h2 class="section-title"><span class="glitch-h">代表项目</span><span class="section-en">// KEY PROJECTS</span></h2>
-  <div class="projects-grid">
-    <article class="proj-card tilt">
-      <div class="proj-bg">JD</div>
-      <div class="proj-body">
-        <h3>京东云及零售 GPU 服务器项目</h3>
-        <p>主导 POC、送测准入、基准验证、大模型训推适配，负责 500+ 台 AI 服务器批量交付。</p>
-      </div>
-      <div class="proj-overlay"><span>2026.06 至今 · 云/零售</span><a href="#contact">FAE 技术支持</a></div>
-    </article>
-    <article class="proj-card tilt">
-      <div class="proj-bg">MT</div>
-      <div class="proj-body">
-        <h3>美团互联网客户 POC</h3>
-        <p>覆盖 Llama3 训练、DeepSeek 671B 双机推理、AI 平台和搜广推模型适配，客户满意度 98%。</p>
-      </div>
-      <div class="proj-overlay"><span>2025.10 至今 · 互联网</span><a href="#contact">年度算力集采中标</a></div>
-    </article>
-    <article class="proj-card tilt">
-      <div class="proj-bg">KS</div>
-      <div class="proj-body">
-        <h3>快手 GPU 板卡/服务器 POC</h3>
-        <p>统筹送测准入、整机联调、功耗温控基线、大模型训练/推理适配，输出上线校验标准。</p>
-      </div>
-      <div class="proj-overlay"><span>2025.04 至今 · POC 负责人</span><a href="#contact">客户选型验收通过</a></div>
-    </article>
-    <article class="proj-card tilt">
-      <div class="proj-bg">CETC</div>
-      <div class="proj-body">
-        <h3>中电科智能院 AI 算力集群</h3>
-        <p>技术评分第一中标，完成 Qwen、DeepSeek-R1、WAN、GLM 等 9 款主流大模型适配调优。</p>
-      </div>
-      <div class="proj-overlay"><span>2025.10 至今 · 央国企</span><a href="#contact">集群交付</a></div>
-    </article>
-    <article class="proj-card tilt">
-      <div class="proj-bg">10W</div>
-      <div class="proj-body">
-        <h3>邮储银行 GPU 图形卡集采</h3>
-        <p>协助信创 GPU 产品需求调研、兼容性测试与投标材料筹备，支撑 10 万张订单落地。</p>
-      </div>
-      <div class="proj-overlay"><span>2022.03-2022.09 · 金融</span><a href="#contact">信创适配</a></div>
-    </article>
-    <article class="proj-card tilt">
-      <div class="proj-bg">30W</div>
-      <div class="proj-body">
-        <h3>工行/移动终端集采</h3>
-        <p>自研 GPU 图形卡终端场景适配验证与问题排查，通过集采技术资质审核，约 30 万张订单。</p>
-      </div>
-      <div class="proj-overlay"><span>2023.02-2024.11 · 金融/运营商</span><a href="#contact">技术资质审核</a></div>
-    </article>
-  </div>
-</section>
-
-<section class="section" id="experience">
-  <h2 class="section-title"><span class="glitch-h">工作经历</span><span class="section-en">// EXPERIENCE</span></h2>
-  <div class="timeline">
-    <article class="timeline-item">
-      <div class="timeline-date">2021.11 - 至今</div>
-      <div class="timeline-card">
-        <h3>摩尔线程智能科技（北京）股份有限公司</h3>
-        <p class="timeline-role">FAE · 人工智能硬件</p>
-        <ul>
-          <li>负责 AI GPU 产品全生命周期技术服务，覆盖大客户 POC、OEM 适配、服务器交付与故障闭环。</li>
-          <li>推进 3 家头部 OEM 客户量产，支撑 10+ 个大型项目落地。</li>
-          <li>搭建机房交付流程：系统安装、GPU 驱动、RoCE 组网、RMA 与跨部门推进。</li>
-        </ul>
-      </div>
-    </article>
-    <article class="timeline-item">
-      <div class="timeline-date">2019.11 - 2021.11</div>
-      <div class="timeline-card">
-        <h3>北京同方信息安全股份有限公司</h3>
-        <p class="timeline-role">测试运维 · 计算机硬件</p>
-        <ul>
-          <li>负责硬件产品测试计划、功能/性能/兼容性验证、故障定位与测试报告输出。</li>
-          <li>联动研发、生产、质量团队处理交付问题，保障产品稳定上线。</li>
-        </ul>
-      </div>
-    </article>
-    <article class="timeline-item">
-      <div class="timeline-date">2017.03 - 2019.11</div>
-      <div class="timeline-card">
-        <h3>联想北京信息技术有限公司</h3>
-        <p class="timeline-role">测试开发 · 计算机硬件</p>
-        <ul>
-          <li>完成 30+ 款服务器硬件测试，覆盖 CPU、内存、存储、背板、BIOS/BMC、系统兼容性与可靠性。</li>
-          <li>熟悉 IPMI、WebUI、远程部署和多操作系统测试环境。</li>
-        </ul>
-      </div>
-    </article>
-  </div>
-</section>
-
-<section class="section" id="contact">
-  <h2 class="section-title"><span class="glitch-h">与我联系</span><span class="section-en">// CONTACT</span></h2>
-  <div class="contact-card">
-    <p>周猛 / Jack Zhou</p>
-    <p>FAE 工程师 · AI 算力技术支持 · 北京</p>
-  </div>
-  <div class="contact-row">
-    <button class="contact-btn" data-copy="1428614426@qq.com" title="点击复制邮箱">Mail</button>
-    <a class="contact-btn" href="https://github.com/jackzhou1018" target="_blank" rel="noreferrer" title="GitHub">Git</a>
-    <button class="contact-btn" data-copy="17609439323" title="点击复制电话">Tel</button>
-    <button class="contact-btn" data-copy="17609439323" title="点击复制微信">WeChat</button>
-  </div>
-  <p class="contact-tip" id="copyTip"></p>
-</section>
-
 <footer class="footer">© 2026 周猛 Jack Zhou · FAE Engineer · AI Compute</footer>
 
-<script src="script.js"></script>
+<script src="script.js?v=20260830-core1"></script>
 </body>
 </html>
