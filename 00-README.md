@@ -32,6 +32,12 @@
 - 组件使用原生 Canvas 实现，不引入 Three.js 或外部 CDN；桌面端作为首屏视觉焦点，移动端改为流式居中布局，并保留 `prefers-reduced-motion` 降级。
 - 当前静态资源版本参数更新为 `20260830-core1`；本次仍为本地改动，尚未提交、推送或发布。
 
+## 2026-08-30 EdgeOne 国内公网部署
+
+- 已通过腾讯云 EdgeOne Pages 直接上传静态站点资产，项目名为 `jack-zhou-resume-cn`。
+- 国内公网地址：https://jack-zhou-resume-cn-eiw6qp1b.edgeone.cool/
+- 已验证公网首页包含 AI Compute Core，PDF 路径返回 HTTP 200；GitHub Pages 地址继续保留作为备用入口。
+
 ## 2026-08-30 入场动画后导航居中修复
 
 - 修复用户反馈“导航页跑偏”：原因是入场后的通用组装动画 `labAssemble` 使用 `transform: translateY(...)`，覆盖了固定导航栏原本依赖的 `transform: translateX(-50%)` 居中定位。
