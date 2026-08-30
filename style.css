@@ -2049,6 +2049,12 @@ body[data-lang="en"] .timeline-card h3 {
   padding: 24px;
 }
 
+/* Give the status badge and identity line enough breathing room on compact
+   screens where the card height is tighter. */
+.contact-card .lab-status {
+  margin-bottom: 14px;
+}
+
 .contact-note {
   color: var(--muted);
 }
