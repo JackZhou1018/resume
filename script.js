@@ -220,7 +220,7 @@ const translations = {
     'FAE 工程师 · AI 算力技术支持 · 北京': 'FAE Engineer · AI Compute Technical Support · Beijing',
     '电话和微信号一致；按钮点击后会复制到剪贴板。': 'Phone and WeChat use the same number; click a button to copy it to the clipboard.',
     '作品详情': 'Work Details',
-    '退出作品 ↩': 'Exit Work ↩',
+    '返回项目': 'Back to Projects',
     '作品预览': 'Work Preview',
     '原作品页面会在这里直接打开；如果浏览器限制嵌入，可使用备用入口新窗口查看。': 'The original work opens here directly; if browser embedding is restricted, use the fallback link to open it in a new window.',
     '新窗口打开原作品 ↗': 'Open Original in New Window ↗',
@@ -738,6 +738,13 @@ const externalWorkFrame = document.getElementById('externalWorkFrame');
 const externalWorkTitle = document.getElementById('externalWorkTitle');
 const externalWorkDesc = document.getElementById('externalWorkDesc');
 const externalWorkLink = document.getElementById('externalWorkLink');
+const projectReaderContent = document.getElementById('projectReaderContent');
+const projectReaderMeta = document.getElementById('projectReaderMeta');
+const projectReaderHeading = document.getElementById('projectReaderHeading');
+const projectReaderSummary = document.getElementById('projectReaderSummary');
+const projectReaderMetrics = document.getElementById('projectReaderMetrics');
+const projectReaderGrid = document.getElementById('projectReaderGrid');
+const projectReaderSteps = document.getElementById('projectReaderSteps');
 const portalCards = document.querySelectorAll('.work-card-portal[data-manual]');
 let activeManualCard = null;
 let readerCloseTimer = null;
@@ -749,6 +756,18 @@ const manualTitles = {
   jarvis: 'JARVIS 全息人形 · 3D Preview',
   deepseek: 'DeepSeek V4 Flash PD 分离部署手册',
   glm: 'GLM5.2 PD 部署操作手册'
+};
+
+const projectDetails = {
+  jd: { meta:'2026.06 至今 · 云 / 零售', title:'京东云及零售 GPU 服务器项目', summary:'围绕 GPU 服务器从 POC、送测准入到批量交付建立完整闭环，长期协调客户、研发、供应链和交付团队。', metrics:['500+ 台 AI 服务器','POC / 基准验证','批量交付'], grid:[['项目职责','主导客户需求澄清、测试项拆解、基准验证和大模型训推适配，推动结果进入选型与订单阶段。'],['技术链路','覆盖服务器硬件、GPU 驱动、模型环境、性能基线、稳定性验证与现场问题闭环。'],['交付沉淀','将现场经验整理为验收清单、上线标准和可复用 SOP，降低批量交付中的重复沟通成本。']], steps:['梳理客户场景与服务器 / 加速卡配置，明确验收目标。','搭建测试环境并完成硬件、驱动、模型和网络基线。','根据结果定位瓶颈，组织研发、供应链和客户联合复测。','输出验收结论与交付文档，推进批量上线。']},
+  meituan: { meta:'2025.10 至今 · 互联网', title:'美团互联网客户 POC', summary:'面向互联网推荐和大模型场景，完成训练、推理、平台适配与客户验收，支撑年度算力集采落地。', metrics:['满意度 98%','Llama3 / LongCat 适配','DeepSeek 671B 双机推理'], grid:[['验证范围','覆盖 Llama3 训练、DeepSeek 671B 双机推理、LongCat 模型适配调优，以及 AI 平台和搜广推模型适配。'],['现场协同','把客户模型、数据、网络和平台约束拆解成可复现测试项，协调多方完成问题闭环。'],['交付结果','以性能、稳定性和可维护性证据支撑客户选型，推动 POC 结果进入年度集采。']], steps:['确认模型版本、并行策略、节点配置和验收指标。','完成 Llama3、LongCat 等模型训练 / 推理链路部署，记录吞吐、时延和显存数据。','针对异常日志和性能波动组织复测与参数调优。','提交验收报告，支撑客户决策和后续交付。']},
+  kuaishou: { meta:'2025.04 至今 · POC 负责人', title:'快手 GPU 板卡 / 服务器 POC', summary:'统筹 GPU 板卡与服务器送测准入、整机联调、功耗温控基线及大模型适配，输出可上线的校验标准。', metrics:['POC 负责人','整机联调','上线校验标准'], grid:[['需求对接','将客户业务场景、卡型选择、服务器配置和平台要求转化为送测计划。'],['验证重点','覆盖功耗温控、稳定性、驱动兼容、模型训练 / 推理和整机协同。'],['标准化输出','整理送测记录、问题清单、复测结论和上线校验标准，便于后续复制。']], steps:['建立送测准入表和环境基线，确认软硬件版本。','完成整机联调、温控功耗和稳定性验证。','执行模型训练 / 推理适配并定位问题根因。','形成上线校验标准与客户验收结论。']},
+  cetc: { meta:'2025.10 至今 · 央国企', title:'中电科智能院 AI 算力集群', summary:'参与技术评分与集群交付，完成 Qwen、DeepSeek-R1、WAN、GLM 等 9 款主流大模型适配调优，并补充 DeepSeek-V4-Flash/Pro 与 GLM-5.1/5.2 的 SGLang 框架适配。', metrics:['技术评分第一','DeepSeek-V4-Flash/Pro','GLM-5.1/5.2 · SGLang'], grid:[['方案工作','结合客户模型和集群资源，规划节点角色、部署方式、网络与验收路径。'],['适配调优','完成 Qwen、DeepSeek-R1、WAN、GLM 等模型适配，并针对 DeepSeek-V4-Flash/Pro、GLM-5.1/5.2 在 SGLang 框架下完成部署验证与参数调优。'],['交付闭环','从环境准备、集群部署到问题定位和验收材料，推动项目按节点交付。']], steps:['确认集群拓扑、节点资源、模型清单和验收口径。','完成操作系统、驱动、运行时、SGLang 与网络环境准备。','逐模型验证训练 / 推理能力，记录性能与稳定性证据。','整理适配结论和交付文档，完成客户验收。']},
+  psbc: { meta:'2022.03 - 2022.09 · 金融', title:'邮储银行 GPU 图形卡集采', summary:'协助信创 GPU 产品需求调研、兼容性测试与投标材料筹备，支撑 10 万张订单落地。', metrics:['10 万张订单','信创适配','投标技术支持'], grid:[['需求调研','围绕金融终端场景梳理图形卡规格、系统环境和兼容性要求。'],['测试验证','配合完成产品兼容性、稳定性与终端场景验证，沉淀测试结果。'],['项目支持','参与投标材料、技术应答和跨团队沟通，为集采决策提供依据。']], steps:['梳理终端、系统和图形应用的兼容性要求。','建立测试矩阵并完成关键场景验证。','汇总测试证据，配合投标技术材料编制。','跟进问题澄清与采购落地。']},
+  icbc: { meta:'2023.02 - 2024.11 · 金融 / 运营商', title:'工行 / 移动终端集采', summary:'负责 GPU 图形卡终端场景适配验证与问题排查，通过集采技术资质审核，支撑约 30 万张订单。', metrics:['约 30 万张','技术资质审核','终端适配'], grid:[['场景验证','覆盖金融和运营商终端的驱动、显示、应用兼容与稳定性问题。'],['问题排查','结合日志、复现环境和版本差异定位问题，协调研发输出修复方案。'],['采购支撑','完成技术资质审核相关材料和验证结论，支撑大规模集采。']], steps:['收集终端型号、系统版本和应用清单。','执行兼容性、稳定性和显示效果验证。','复现问题并完成版本 / 驱动排查。','提交资质审核证据和集采技术结论。']},
+  robotics: { meta:'2024.02 - 2024.10 · 工业机器人', title:'东土科技工业机器人项目', summary:'协助对接 ODM 与工业自动化合作伙伴，推进摩尔线程高算力 SOC 芯片与工业机器人场景的软硬件适配和落地交付。', metrics:['工业机器人场景','SOC 适配','ODM 协同'], grid:[['合作协同','对接 ODM、工业自动化伙伴和芯片团队，拉通需求、方案与验证节奏。'],['适配工作','围绕机器人场景完成软硬件接口、图形能力和系统稳定性验证。'],['交付推进','梳理采购需求、问题清单和落地条件，推动方案进入实际应用。']], steps:['确认机器人控制、视觉和图形计算场景。','完成硬件、驱动、系统和应用接口适配。','记录现场问题并组织 ODM 与研发联合排查。','输出适配结论和采购 / 交付建议。']},
+  bim: { meta:'2025.12 至今 · 建筑设计', title:'雅江集团建研院国产图形工作站项目', summary:'主导项目统筹，携手紫光计算机拉通需求、方案、测试链路，设计国产化图形工作站和多场景测试验证体系。', metrics:['国产化图形工作站','多场景验证','预计建模效率提升 90%'], grid:[['方案统筹','将建筑设计软件、模型规模和工作流要求拆解为工作站配置与测试方案。'],['协同推进','联合紫光计算机及相关团队推进需求、方案、测试和问题收敛。'],['价值验证','围绕 3D 建模等典型场景建立验证基线，评估国产化方案的可用性。']], steps:['调研建模、渲染、协同等典型工作流。','完成国产硬件、驱动和软件环境配置。','执行多场景性能、稳定性和兼容性测试。','沉淀选型建议、测试报告与交付方案。']},
+  events: { meta:'2021.12 至今 · 产品支持', title:'公司大型展会产品支持', summary:'负责新品发布会、MDC 2025 医疗板块、紫光销售大会、WAIC、中移动装备供应链大会等展会 Demo 部署与现场讲解。', metrics:['50+ 场讲解','30+ 意向线索','Demo 部署支持'], grid:[['现场交付','根据展会场地、设备和演示脚本完成 Demo 部署、联调与现场保障。'],['产品讲解','面向客户和合作伙伴讲解 GPU、服务器及 AI 算力产品能力和应用场景。'],['线索沉淀','记录现场反馈、客户问题和意向线索，为销售和产品迭代提供输入。']], steps:['确认展会主题、演示设备、网络和脚本。','完成设备部署、模型 / 应用调试和故障预案。','现场演示并根据观众问题调整讲解路径。','汇总反馈、线索和复盘结论。']}
 };
 
 function openManual(manual, card) {
@@ -767,6 +786,7 @@ function openManual(manual, card) {
   document.querySelectorAll('[data-manual-content]').forEach(content => {
     content.classList.toggle('is-active', !externalUrl && content.dataset.manualContent === manual);
   });
+  projectReaderContent?.classList.remove('is-active');
   externalWorkContent?.classList.toggle('is-active', Boolean(externalUrl));
 
   if (externalUrl) {
@@ -791,6 +811,29 @@ function openManual(manual, card) {
   });
 }
 
+function openProjectDetail(key, card) {
+  const detail = projectDetails[key];
+  if (!workReader || !detail) return;
+  clearTimeout(readerCloseTimer);
+  activeManualCard = card || document.querySelector(`[data-project-open="${key}"]`)?.closest('.proj-card');
+  document.querySelectorAll('.work-card-portal').forEach(item => item.classList.remove('is-diving', 'is-returning'));
+  document.querySelectorAll('[data-manual-content]').forEach(content => content.classList.remove('is-active'));
+  projectReaderContent?.classList.add('is-active');
+  if (projectReaderMeta) projectReaderMeta.textContent = detail.meta;
+  if (projectReaderHeading) projectReaderHeading.textContent = detail.title;
+  if (projectReaderSummary) projectReaderSummary.textContent = detail.summary;
+  if (projectReaderMetrics) projectReaderMetrics.innerHTML = detail.metrics.map(item => `<span><strong>${item}</strong></span>`).join('');
+  if (projectReaderGrid) projectReaderGrid.innerHTML = detail.grid.map(item => `<section><h4>${item[0]}</h4><p>${item[1]}</p></section>`).join('');
+  if (projectReaderSteps) projectReaderSteps.innerHTML = detail.steps.map((item, index) => `<li><b>${String(index + 1).padStart(2, '0')}</b><span>${item}</span></li>`).join('');
+  if (activeManualCard) activeManualCard.classList.add('is-diving');
+  if (readerTitle) readerTitle.textContent = detail.title;
+  workReader.hidden = false;
+  workReader.setAttribute('aria-hidden', 'false');
+  workReader.classList.remove('is-closing', 'has-frame');
+  document.body.classList.add('reader-open');
+  window.requestAnimationFrame(() => { workReader.classList.add('is-open'); readerClose?.focus({ preventScroll: true }); });
+}
+
 function closeManual() {
   if (!workReader || workReader.hidden) return;
   workReader.classList.add('is-closing');
@@ -807,6 +850,7 @@ function closeManual() {
     workReader.classList.remove('is-closing', 'has-frame');
     document.body.classList.remove('reader-open');
     document.querySelectorAll('[data-manual-content]').forEach(content => content.classList.remove('is-active'));
+    projectReaderContent?.classList.remove('is-active');
     externalWorkContent?.classList.remove('is-active');
     if (externalWorkFrame) externalWorkFrame.removeAttribute('src');
     if (activeManualCard) {
@@ -837,6 +881,13 @@ workReader?.addEventListener('click', event => {
 });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && workReader && !workReader.hidden) closeManual();
+});
+
+document.querySelectorAll('[data-project-open]').forEach(button => {
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    openProjectDetail(button.dataset.projectOpen, button.closest('.proj-card'));
+  });
 });
 
 /* ---------- 参考站等价功能：作品/项目筛选 ---------- */
@@ -899,6 +950,22 @@ document.querySelectorAll('.contact-btn[data-copy]').forEach(btn => {
       if (copyTip) copyTip.textContent = currentLanguage === 'en' ? 'Copy failed. Please copy manually: ' + val : '复制失败，请手动复制：' + val;
     });
   });
+});
+
+/* ---------- 分享简历链接 ---------- */
+const shareResume = document.getElementById('shareResume');
+shareResume?.addEventListener('click', async () => {
+  const currentUrl = window.location.href.split('#')[0];
+  const shareUrl = /^(https?:\/\/)?(127\.0\.0\.1|localhost)/i.test(currentUrl)
+    ? 'https://jackzhou1018.github.io/resume/'
+    : currentUrl;
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    if (copyTip) copyTip.textContent = currentLanguage === 'en' ? '✓ Link copied: ' + shareUrl : '✓ 已复制简历链接';
+  } catch (error) {
+    if (copyTip) copyTip.textContent = currentLanguage === 'en' ? 'Copy failed. Please copy the URL manually.' : '复制失败，请手动复制网址';
+  }
+  window.setTimeout(() => { if (copyTip) copyTip.textContent = ''; }, 2400);
 });
 
 /* ---------- 移动端导航 ---------- */
