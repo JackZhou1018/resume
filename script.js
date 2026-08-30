@@ -1045,7 +1045,12 @@ document.addEventListener('keydown', event => {
 });
 
 applyLanguage(readPreference(LANG_KEY, 'zh'));
-activateView(window.location.hash.slice(1) || 'hero', false);
+// Every external entry starts at the hero screen. Hashes are used only for
+// in-page navigation after the document is already open.
+activateView('hero', false);
+if (window.location.hash) {
+  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+}
 
 /* ---------- 入场动效：Digital Lab Boot ---------- */
 const bootOverlay = document.getElementById('glitchOverlay');
