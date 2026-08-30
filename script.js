@@ -955,10 +955,15 @@ document.querySelectorAll('.contact-btn[data-copy]').forEach(btn => {
 /* ---------- 分享简历链接 ---------- */
 const shareResume = document.getElementById('shareResume');
 shareResume?.addEventListener('click', async () => {
+  const host = window.location.hostname.toLowerCase();
   const currentUrl = window.location.href.split('#')[0];
-  const shareUrl = /^(https?:\/\/)?(127\.0\.0\.1|localhost)/i.test(currentUrl)
+  const shareUrl = /^(127\.0\.0\.1|localhost)$/i.test(host)
     ? 'https://jackzhou1018.github.io/resume/'
-    : 'https://jackzhou1018.github.io/resume/';
+    : host.includes('netlify.app')
+      ? 'https://jack-zhou-resume-global.netlify.app/'
+      : host.includes('github.io')
+        ? 'https://jackzhou1018.github.io/resume/'
+        : currentUrl;
   try {
     await navigator.clipboard.writeText(shareUrl);
     if (copyTip) copyTip.textContent = currentLanguage === 'en' ? '✓ Link copied: ' + shareUrl : '✓ 已复制简历链接';
