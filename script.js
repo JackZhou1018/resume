@@ -1060,8 +1060,8 @@ if (prefersReducedMotion) {
 } else {
   window.setTimeout(() => {
     document.body.classList.remove('is-booting');
-  }, 1460);
-  window.setTimeout(finishBoot, 1950);
+  }, 2200);
+  window.setTimeout(finishBoot, 2800);
 }
 
 /* ---------- 背景视频加载兜底 ---------- */
