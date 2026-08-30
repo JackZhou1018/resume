@@ -4,8 +4,14 @@
 
 - 线上地址：https://jackzhou1018.github.io/resume/
 - 类型：纯静态 GitHub Pages 简历网站
-- 当前阶段：以原始 PDF 简历为内容源，按 v0 EinCode Digital Lab 结构重做，尚未发布
+- 当前阶段：以原始 PDF 简历为内容源，按 v0 EinCode Digital Lab 结构重做；GitHub Pages 已发布，Share 入口已修复
 - 本地顶部入口：http://127.0.0.1:8093/index.html?cardtonecheck=20260830-cardtone1
+
+## 2026-08-30 Share 入口与锚点直达修复
+
+- 修复带 `#contact` 公网链接打开时被初始化逻辑强制回到首页的问题，确保 Contact Terminal 可直接访问。
+- Share 按钮点击后复制固定公网简历链接 `https://jackzhou1018.github.io/resume/`，避免复制本地预览地址或带 hash 的临时地址。
+- 静态资源版本参数更新为 `20260830-share2`，用于绕过浏览器旧缓存。
 
 ## 2026-08-30 基于下载版 PDF 补充项目经历
 

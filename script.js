@@ -958,7 +958,7 @@ shareResume?.addEventListener('click', async () => {
   const currentUrl = window.location.href.split('#')[0];
   const shareUrl = /^(https?:\/\/)?(127\.0\.0\.1|localhost)/i.test(currentUrl)
     ? 'https://jackzhou1018.github.io/resume/'
-    : currentUrl;
+    : 'https://jackzhou1018.github.io/resume/';
   try {
     await navigator.clipboard.writeText(shareUrl);
     if (copyTip) copyTip.textContent = currentLanguage === 'en' ? '✓ Link copied: ' + shareUrl : '✓ 已复制简历链接';
@@ -1025,10 +1025,6 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-if (window.location.hash) {
-  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
-}
-
 window.addEventListener('hashchange', () => {
   activateView(window.location.hash.slice(1) || 'hero', false);
 });
@@ -1044,7 +1040,7 @@ document.addEventListener('keydown', event => {
 });
 
 applyLanguage(readPreference(LANG_KEY, 'zh'));
-activateView('hero', false);
+activateView(window.location.hash.slice(1) || 'hero', false);
 
 /* ---------- 入场动效：Digital Lab Boot ---------- */
 const bootOverlay = document.getElementById('glitchOverlay');
