@@ -1026,10 +1026,14 @@ body[data-lang="en"] .timeline-card h3 {
 }
 
 .compute-core {
-  position: absolute;
-  top: 22px;
-  left: 2px;
-  width: min(300px, 42vw);
+  /* Keep the visual in document flow so it cannot cover the headline at
+     compact laptop resolutions or when browser zoom is increased. */
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(360px, 100%);
+  margin: 0 0 28px;
+  order: -1;
   aspect-ratio: 1;
   z-index: 0;
   border: 1px solid color-mix(in srgb, var(--orange) 26%, transparent);
@@ -1098,11 +1102,11 @@ body[data-lang="en"] .timeline-card h3 {
 }
 
 @media (max-width: 980px) {
-  .compute-core { left: auto; right: 0; width: min(260px, 44vw); opacity: .84; }
+  .compute-core { width: min(360px, 100%); opacity: .92; }
 }
 
 @media (max-width: 640px) {
-  .compute-core { position: relative; top: auto; left: auto; right: auto; width: min(300px, 86vw); margin: 0 auto 26px; order: -1; opacity: 1; }
+  .compute-core { width: min(300px, 86vw); margin: 0 auto 26px; opacity: 1; }
   .hero-copy { justify-content: flex-start; }
 }
 
